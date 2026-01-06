@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Al-Qur'an Digital</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        .arabic {
+            font-family: 'Amiri', serif;
+            direction: rtl;
+        }
+    </style>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+</head>
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition">
+
+    <header class="sticky top-0 bg-white dark:bg-gray-800 shadow z-10">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex flex-wrap gap-2 items-center justify-between">
+            <h1 class="font-semibold text-lg">Al-Qur'an</h1>
+
+            <div class="flex gap-2 items-center">
+                <select id="mode" class="border rounded px-2 py-1 text-sm dark:bg-gray-700">
+                    <option value="juz">Per Juz</option>
+                    <option value="surah">Per Surah</option>
+                </select>
+
+                <select id="selector" class="border rounded px-2 py-1 text-sm dark:bg-gray-700"></select>
+
+                <button id="toggleTrans" class="text-sm px-2 py-1 border rounded">
+                    Terjemahan
+                </button>
+
+                <button id="darkToggle" class="text-sm px-2 py-1 border rounded">
+                    🌙
+                </button>
+            </div>
+        </div>
+
+        <div class="max-w-5xl mx-auto px-4 pb-3">
+            <input id="search" placeholder="Cari ayat…"
+                class="w-full px-3 py-2 border rounded text-sm dark:bg-gray-700">
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-6">
+        <div id="loading" class="text-center py-10 text-gray-500">Memuat…</div>
+        <div id="content" class="space-y-10 hidden"></div>
+    </main>
+
+    <script>
+        const modeEl = document.getElementById('mode');
+        const selector = document.getElementById('selector');
+        const content = document.getElementById('content');
+        const loading = document.getElementById('loading');
+        const toggleTrans = document.getElementById('toggleTrans');
+        const darkToggle = document.getElementById('darkToggle');
+        const searchInput = document.getElementById('search');
+
+        let showTranslation = true;
+        let allAyahs = [];
+        let surahList = [];
+
+        async function fetchJSON(url) {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('API error');
+            return res.json();
+        }
+
+        // DARK MODE
+        darkToggle.onclick = () => {
+            document.documentElement.classList.toggle('dark');
+        };
+
+        // TOGGLE TERJEMAHAN
+        toggleTrans.onclick = () => {
+            showTranslation = !showTranslation;
+            document.querySelectorAll('.translation').forEach(el => {
+                el.classList.toggle('hidden', !showTranslation);
+            });
+        };
+
+        // LOAD SURAH LIST (NAMA ASLI)
+        async function loadSurahList() {
+            const data = await fetchJSON('https://api.alquran.cloud/v1/surah');
+            surahList = data.data;
+        }
+
+        // POPULATE SELECT
+        async function populateSelector() {
+            selector.innerHTML = '';
+
+            if (modeEl.value === 'juz') {
+                for (let i = 1; i <= 30; i++) {
+                    selector.innerHTML += `<option value="${i}">Juz ${i}</option>`;
+                }
+            } else {
+                if (!surahList.length) await loadSurahList();
+                surahList.forEach(s => {
+                    selector.innerHTML += `
+        <option value="${s.number}">
+          ${s.number}. ${s.name} (${s.englishName})
+        </option>
+      `;
+                });
+            }
+        }
+
+        // LOAD CONTENT
+        async function loadContent() {
+            loading.classList.remove('hidden');
+            content.classList.add('hidden');
+            content.innerHTML = '';
+            allAyahs = [];
+
+            let arabUrl, idUrl;
+
+            if (modeEl.value === 'juz') {
+                arabUrl = `https://api.alquran.cloud/v1/juz/${selector.value}/quran-uthmani`;
+                idUrl = `https://api.alquran.cloud/v1/juz/${selector.value}/id.indonesian`;
+            } else {
+                arabUrl = `https://api.alquran.cloud/v1/surah/${selector.value}/quran-uthmani`;
+                idUrl = `https://api.alquran.cloud/v1/surah/${selector.value}/id.indonesian`;
+            }
+
+            const [arab, id] = await Promise.all([
+                fetchJSON(arabUrl),
+                fetchJSON(idUrl)
+            ]);
+
+            let currentSurah = null;
+
+            arab.data.ayahs.forEach((ayah, i) => {
+                if (ayah.surah.name !== currentSurah) {
+                    currentSurah = ayah.surah.name;
+                    content.innerHTML += `
+        <div class="text-center border-b pb-4">
+          <h2 class="arabic text-3xl">${ayah.surah.name}</h2>
+          <p class="text-sm text-gray-500">
+            ${ayah.surah.englishName} • ${ayah.surah.numberOfAyahs} Ayat
+          </p>
+        </div>
+      `;
+                }
+
+                content.innerHTML += `
+      <div class="ayah border-b pb-6 space-y-2">
+        <div class="arabic text-2xl leading-loose text-right cursor-pointer"
+          onclick="new Audio('https://cdn.islamic.network/quran/audio/128/ar.alafasy/${ayah.number}').play()">
+          ${ayah.text}
+          <span class="text-sm text-gray-400">(${ayah.numberInSurah})</span>
+        </div>
+        <div class="translation text-sm text-gray-600 dark:text-gray-400">
+          ${id.data.ayahs[i].text}
+        </div>
+      </div>
+    `;
+
+                allAyahs.push({
+                    arab: ayah.text,
+                    id: id.data.ayahs[i].text.toLowerCase()
+                });
+            });
+
+            loading.classList.add('hidden');
+            content.classList.remove('hidden');
+        }
+
+        // SEARCH
+        searchInput.oninput = () => {
+            const q = searchInput.value.toLowerCase();
+            document.querySelectorAll('.ayah').forEach((el, i) => {
+                el.classList.toggle(
+                    'hidden',
+                    !allAyahs[i].arab.includes(q) && !allAyahs[i].id.includes(q)
+                );
+            });
+        };
+
+        modeEl.onchange = async () => {
+            await populateSelector();
+            loadContent();
+        };
+
+        selector.onchange = () => {
+            loadContent();
+            window.scrollTo(0, 0);
+        };
+
+        // INIT
+        (async () => {
+            await populateSelector();
+            loadContent();
+        })();
+    </script>
+
+    </script>
+
+</body>
+
+</html>
