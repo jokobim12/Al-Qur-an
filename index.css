@@ -27,6 +27,7 @@ body {
     width: 100%;
     max-width: 440px;
     height: 100vh;
+    height: 100dvh; /* Dynamic viewport height untuk mobile browser (Safari iOS/Chrome Android) */
     background-color: #f8f9fb;
     display: flex;
     flex-direction: column;
@@ -76,12 +77,15 @@ main {
     flex-grow: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 1.5rem 1rem 2.5rem 1rem;
+    padding: 1.5rem 1rem 5.5rem 1rem; /* Padding bawah ekstra agar konten tidak tertutup bottom nav */
 }
 
-/* Bottom Navigation Bar */
+/* Bottom Navigation Bar (Sticky Bottom Permanen) */
 nav {
-    flex-shrink: 0;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
     z-index: 40;
     background-color: #ffffff;
     border-top: 1px solid #e2e8f0;
@@ -89,7 +93,7 @@ nav {
 }
 .dark nav {
     background-color: #1f293d;
-    border-top-color: #334155;
+    border-color: #334155;
 }
 
 /* Audio Player Bar */
@@ -134,13 +138,7 @@ nav {
     padding: 1rem;
 }
 
-/* Floating Mic Button */
-.floating-mic {
-    position: absolute;
-    bottom: 85px;
-    right: 1.5rem;
-    z-index: 32;
-}
+
 
 /* ==========================================================================
    CUSTOM SCROLLBAR FOR MAIN CONTENT
