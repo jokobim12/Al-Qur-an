@@ -141,20 +141,14 @@ nav {
 
 
 /* ==========================================================================
-   CUSTOM SCROLLBAR FOR MAIN CONTENT
+   HIDE SCROLLBAR FOR MAIN CONTENT (NATIVE MOBILE APP LOOK)
    ========================================================================== */
 main::-webkit-scrollbar {
-    width: 6px;
+    display: none;
 }
-main::-webkit-scrollbar-track {
-    background: transparent;
-}
-main::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 0.5rem;
-}
-.dark main::-webkit-scrollbar-thumb {
-    background: #334155;
+main {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
 }
 
 /* Hide scrollbar utility */

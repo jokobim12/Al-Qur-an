@@ -1,0 +1,18 @@
+{
+  "name": "Al-Qur'an Digital Premium",
+  "short_name": "Al-Qur'an",
+  "description": "Aplikasi Al-Qur'an Digital Premium dengan Jadwal Sholat, Qari Murottal, dan Fitur PWA",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8f9fb",
+  "theme_color": "#10b981",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
