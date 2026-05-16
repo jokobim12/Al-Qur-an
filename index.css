@@ -1,0 +1,180 @@
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ==========================================================================
+   DESKTOP OUTER BACKGROUND & BODY STYLING
+   ========================================================================== */
+body {
+    background-color: #e2e8f0;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    transition: background-color 0.3s ease;
+}
+
+.dark body {
+    background-color: #090d16;
+}
+
+/* ==========================================================================
+   MOBILE APP CONTAINER (SMARTPHONE FRAME) - FLAT DESIGN
+   ========================================================================== */
+#app-container {
+    width: 100%;
+    max-width: 440px;
+    height: 100vh;
+    background-color: #f8f9fb;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    box-shadow: none;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.dark #app-container {
+    background-color: #121826;
+    color: #f1f5f9;
+}
+
+/* Desktop Smartphone Frame Styling - Flat & rounded-lg */
+@media (min-width: 768px) {
+    #app-container {
+        height: 90vh;
+        max-height: 860px;
+        border-radius: 1rem; /* rounded-lg */
+        box-shadow: 0px 0px 0px 2px #a5a5a5;
+    }
+    .dark #app-container {
+        border-color: #1e293b;
+    }
+}
+
+/* ==========================================================================
+   LAYOUT CHILDREN STYLING
+   ========================================================================== */
+
+/* Header */
+header {
+    flex-shrink: 0;
+    z-index: 30;
+    background-color: rgba(248, 249, 251, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+.dark header {
+    background-color: rgba(18, 24, 38, 0.85);
+    border-bottom-color: rgba(31, 41, 61, 0.8);
+}
+
+/* Scrollable Main Content Area */
+main {
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 1.5rem 1rem 2.5rem 1rem;
+}
+
+/* Bottom Navigation Bar */
+nav {
+    flex-shrink: 0;
+    z-index: 40;
+    background-color: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    box-shadow: none;
+}
+.dark nav {
+    background-color: #1f293d;
+    border-top-color: #334155;
+}
+
+/* Audio Player Bar */
+#audio-player-bar {
+    position: absolute;
+    bottom: 76px; /* Jarak elegan di atas bottom nav */
+    left: 1rem;
+    right: 1rem;
+    z-index: 35;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem; /* rounded-lg */
+    box-shadow: none;
+}
+.dark #audio-player-bar {
+    background-color: #1f293d;
+    border-color: #334155;
+}
+
+/* Modals & Toasts (Positioned absolute inside phone screen) */
+#toast-container {
+    position: absolute;
+    bottom: 140px; /* Diposisikan di bagian bawah agar tidak menutupi tombol header */
+    top: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 60;
+    width: 90%;
+    max-width: 380px;
+    pointer-events: none;
+}
+
+.modal-container {
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+/* Floating Mic Button */
+.floating-mic {
+    position: absolute;
+    bottom: 85px;
+    right: 1.5rem;
+    z-index: 32;
+}
+
+/* ==========================================================================
+   CUSTOM SCROLLBAR FOR MAIN CONTENT
+   ========================================================================== */
+main::-webkit-scrollbar {
+    width: 6px;
+}
+main::-webkit-scrollbar-track {
+    background: transparent;
+}
+main::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 0.5rem;
+}
+.dark main::-webkit-scrollbar-thumb {
+    background: #334155;
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* ==========================================================================
+   ANIMATIONS
+   ========================================================================== */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn {
+    animation: fadeIn 0.3s ease-out forwards;
+}

@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Al-Quran Digital - Flat Design Mode Baca Mobile</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0d5c3a',
+                        'primary-light': '#158051',
+                        'primary-dark': '#0a4a2f',
+                        secondary: '#f58d37',
+                        'secondary-hover': '#e07b2b',
+                        darkbg: '#121826',
+                        darkcard: '#1f293d',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        arabic: ['Amiri', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts & Custom CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body class="bg-slate-200 dark:bg-[#090d16] text-gray-800 dark:text-gray-100 font-sans transition-colors duration-300">
+
+    <!-- ==================== MOBILE APP CONTAINER ==================== -->
+    <div id="app-container">
+
+        <!-- Toast Notification Container -->
+        <div id="toast-container" class="flex flex-col gap-2 pointer-events-none"></div>
+
+        <!-- Top Header -->
+        <header class="px-4 py-4 flex items-center justify-between transition-colors border-b border-gray-200 dark:border-gray-800">
+            <div class="flex items-center gap-3 overflow-hidden">
+                <a href="index.html#quran" class="w-10 h-10 rounded-lg bg-white dark:bg-darkcard border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-emerald-400 transition flex-shrink-0">
+                    <i class="fa-solid fa-arrow-left text-sm"></i>
+                </a>
+                <div class="overflow-hidden">
+                    <h1 id="surah-header-name" class="font-bold text-base md:text-lg text-primary dark:text-emerald-400 tracking-wide truncate">Al-Kahf</h1>
+                    <p id="surah-header-meta" class="text-[11px] text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wider truncate">119 Ayat • Makkiyah</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 flex-shrink-0">
+                <button onclick="toggleFontSizeModal()" class="w-10 h-10 rounded-lg bg-white dark:bg-darkcard border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-emerald-400 transition font-bold text-xs">
+                    Tt
+                </button>
+                <button onclick="showToast('Tidak ada notifikasi baru', 'info')" class="w-10 h-10 rounded-lg bg-white dark:bg-darkcard border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-emerald-400 transition relative">
+                    <i class="fa-regular fa-bell text-sm"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="space-y-6">
+
+            <!-- Bismillah Banner -->
+            <div id="bismillah-card" class="bg-white dark:bg-darkcard rounded-lg p-6 border border-gray-200 dark:border-gray-800 text-center space-y-3 animate-fadeIn">
+                <div class="text-primary dark:text-emerald-400 text-xl flex justify-center">
+                    <i class="fa-solid fa-wand-magic-sparkles animate-pulse"></i>
+                </div>
+                <h2 class="font-arabic text-2xl md:text-3xl font-bold leading-loose text-gray-900 dark:text-white">
+                    بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
+                </h2>
+                <p class="text-xs md:text-sm italic text-gray-500 dark:text-gray-400 max-w-xs mx-auto" data-i18n="bismillah_desc">
+                    Dengan nama Allah Yang Maha Pengasih, Maha Penyayang.
+                </p>
+                <div class="w-12 h-[2px] bg-gray-200 dark:bg-gray-700 mx-auto mt-2"></div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading-state" class="py-16 text-center text-gray-500 dark:text-gray-400 space-y-3">
+                <i class="fa-solid fa-spinner fa-spin text-3xl text-primary"></i>
+                <p class="text-sm font-medium" data-i18n="loading_surah_baca">Memuat surah dan terjemahan...</p>
+            </div>
+
+            <!-- Ayah Cards Container -->
+            <div id="content" class="space-y-4 hidden animate-fadeIn pb-20">
+                <!-- Ayah cards injected here -->
+            </div>
+
+        </main>
+
+        <!-- ==================== AUDIO PLAYER BAR ==================== -->
+        <div id="audio-player-bar" class="mx-4 mb-3 px-5 pt-4 pb-2.5 bg-white dark:bg-darkcard border border-gray-200 dark:border-gray-800 rounded-lg transition-all duration-300 transform translate-y-full opacity-0">
+            <div class="flex flex-col gap-2.5">
+                <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5 overflow-hidden">
+                        <div class="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-primary dark:text-emerald-400 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                            <i class="fa-solid fa-headphones"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <h4 id="audio-surah-title" class="font-bold text-xs text-gray-900 dark:text-white truncate">Al-Kahf</h4>
+                            <p id="audio-ayah-label" class="text-[10px] text-gray-500 dark:text-gray-400 truncate">Ayat 1 • Mishary Rashid</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 flex-shrink-0">
+                        <button onclick="prevAyah()" class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary transition">
+                            <i class="fa-solid fa-backward-step text-xs"></i>
+                        </button>
+                        <button onclick="togglePlayPause()" id="audio-play-btn" class="w-10 h-10 rounded-lg bg-primary hover:bg-primary-light text-white flex items-center justify-center hover:scale-105 transition duration-200">
+                            <i class="fa-solid fa-play text-sm"></i>
+                        </button>
+                        <button onclick="nextAyah()" class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary transition">
+                            <i class="fa-solid fa-forward-step text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <span id="audio-cur-time" class="text-[9px] font-mono text-gray-400">00:00</span>
+                    <div class="flex-1 h-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden relative cursor-pointer" onclick="seekAudio(event)">
+                        <div id="audio-progress" class="h-full bg-primary dark:bg-emerald-500 rounded-lg w-0 transition-all duration-100"></div>
+                    </div>
+                    <span id="audio-dur-time" class="text-[9px] font-mono text-gray-400">00:00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Font Size Modal -->
+        <div id="font-size-modal" class="modal-container hidden opacity-0 transition-opacity duration-300">
+            <div class="bg-white dark:bg-darkcard w-full max-w-sm rounded-lg p-6 border border-gray-200 dark:border-gray-800 space-y-6">
+                <div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-4">
+                    <h3 class="font-bold text-sm text-gray-900 dark:text-white" data-i18n="font_modal_title">Pengaturan Ukuran Font</h3>
+                    <button onclick="toggleFontSizeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-white transition">
+                        <i class="fa-solid fa-xmark text-base"></i>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <label class="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider block" data-i18n="font_modal_label">Ukuran Teks Arab</label>
+                    <div class="flex items-center justify-between gap-4 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg border border-gray-200 dark:border-gray-800">
+                        <button onclick="adjustFontSize('decrease')" class="w-10 h-10 bg-white dark:bg-darkcard rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center font-bold text-base hover:bg-primary hover:text-white transition">-</button>
+                        <span id="font-size-display" class="font-bold text-sm text-primary dark:text-emerald-400">Normal (3xl)</span>
+                        <button onclick="adjustFontSize('increase')" class="w-10 h-10 bg-white dark:bg-darkcard rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center font-bold text-base hover:bg-primary hover:text-white transition">+</button>
+                    </div>
+                </div>
+                <button onclick="toggleFontSizeModal()" class="w-full bg-primary hover:bg-primary-light text-white font-semibold py-2.5 rounded-lg transition duration-200 text-xs" data-i18n="done_btn">
+                    Selesai
+                </button>
+            </div>
+        </div>
+
+        <!-- BOTTOM NAVIGATION BAR -->
+        <nav class="px-6 py-3 border-t border-gray-200 dark:border-gray-800 transition-colors">
+            <div class="flex items-center justify-around">
+                <a href="index.html#home" class="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-emerald-400 font-medium transition group">
+                    <i class="fa-solid fa-house text-xl group-hover:scale-110 transition"></i>
+                    <span class="text-xs font-semibold" data-i18n="home_nav">Home</span>
+                    <span class="w-1 h-1 bg-transparent rounded-lg mt-0.5"></span>
+                </a>
+                <a href="index.html#quran" class="flex flex-col items-center gap-1 text-primary dark:text-emerald-400 font-medium transition group">
+                    <i class="fa-solid fa-book-open text-xl group-hover:scale-110 transition"></i>
+                    <span class="text-xs font-semibold" data-i18n="quran_nav">Quran</span>
+                    <span class="w-1 h-1 bg-primary dark:bg-emerald-400 rounded-lg mt-0.5"></span>
+                </a>
+                <a href="index.html#prayers" class="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-emerald-400 font-medium transition group">
+                    <i class="fa-solid fa-clock text-xl group-hover:scale-110 transition"></i>
+                    <span class="text-xs font-semibold" data-i18n="prayers_nav">Prayers</span>
+                    <span class="w-1 h-1 bg-transparent rounded-lg mt-0.5"></span>
+                </a>
+                <a href="profil.html" class="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-emerald-400 font-medium transition group">
+                    <i class="fa-solid fa-gear text-xl group-hover:scale-110 transition"></i>
+                    <span class="text-xs font-semibold" data-i18n="settings_nav">Settings</span>
+                    <span class="w-1 h-1 bg-transparent rounded-lg mt-0.5"></span>
+                </a>
+            </div>
+        </nav>
+
+    </div>
+
+    <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+    <script>
+        const translations = {
+            'id.indonesian': {
+                'font_modal_title': 'Pengaturan Ukuran Font',
+                'font_modal_label': 'Ukuran Teks Arab',
+                'done_btn': 'Selesai',
+                'loading_surah_baca': 'Memuat surah dan terjemahan...',
+                'bismillah_desc': 'Dengan nama Allah Yang Maha Pengasih, Maha Penyayang.',
+                'home_nav': 'Home',
+                'quran_nav': 'Quran',
+                'prayers_nav': 'Prayers',
+                'settings_nav': 'Settings'
+            },
+            'en.asad': {
+                'font_modal_title': 'Font Size Settings',
+                'font_modal_label': 'Arabic Text Size',
+                'done_btn': 'Done',
+                'loading_surah_baca': 'Loading surah and translation...',
+                'bismillah_desc': 'In the name of Allah, the Entirely Merciful, the Especially Merciful.',
+                'home_nav': 'Home',
+                'quran_nav': 'Quran',
+                'prayers_nav': 'Prayers',
+                'settings_nav': 'Settings'
+            }
+        };
+
+        let currentSurahData = null;
+        let currentTranslationData = null;
+        let activeAyahIndex = -1;
+        let audioInstance = null;
+        let arabicFontSizeClass = 'text-3xl';
+        let fontSizes = ['text-2xl', 'text-3xl', 'text-4xl', 'text-5xl'];
+        let fontIndex = 1;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            applyUITranslations();
+            const urlParams = new URLSearchParams(window.location.search);
+            const surahNumber = parseInt(urlParams.get('surah')) || 1;
+            loadSurah(surahNumber);
+        });
+
+        function applyUITranslations() {
+            const lang = localStorage.getItem('userLang') || 'id.indonesian';
+            const dict = translations[lang] || translations['id.indonesian'];
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dict[key]) { el.innerText = dict[key]; }
+            });
+
+            const labels = lang === 'en.asad' ? ['Small (2xl)', 'Normal (3xl)', 'Large (4xl)', 'Huge (5xl)'] : ['Kecil (2xl)', 'Normal (3xl)', 'Besar (4xl)', 'Sangat Besar (5xl)'];
+            document.getElementById('font-size-display').innerText = labels[fontIndex];
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let bg = type === 'success' ? 'bg-emerald-600 text-white' : type === 'error' ? 'bg-red-600 text-white' : 'bg-blue-600 text-white';
+
+            toast.className = `flex items-center gap-3 px-4 py-3 rounded-lg ${bg} text-xs font-semibold animate-bounce transition-all duration-300 pointer-events-auto border border-white/10`;
+            toast.innerHTML = `
+                <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-info'} text-base"></i>
+                <span class="flex-1">${message}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') document.documentElement.classList.add('dark');
+        }
+
+        function toggleFontSizeModal() {
+            const modal = document.getElementById('font-size-modal');
+            modal.classList.toggle('hidden');
+            setTimeout(() => modal.classList.toggle('opacity-0'), 10);
+        }
+
+        function adjustFontSize(action) {
+            if (action === 'increase' && fontIndex < fontSizes.length - 1) fontIndex++;
+            if (action === 'decrease' && fontIndex > 0) fontIndex--;
+
+            arabicFontSizeClass = fontSizes[fontIndex];
+            const lang = localStorage.getItem('userLang') || 'id.indonesian';
+            const labels = lang === 'en.asad' ? ['Small (2xl)', 'Normal (3xl)', 'Large (4xl)', 'Huge (5xl)'] : ['Kecil (2xl)', 'Normal (3xl)', 'Besar (4xl)', 'Sangat Besar (5xl)'];
+            document.getElementById('font-size-display').innerText = labels[fontIndex];
+
+            document.querySelectorAll('.arabic-text').forEach(el => {
+                el.className = `arabic-text font-arabic font-bold text-right leading-loose text-gray-900 dark:text-white transition-all duration-200 cursor-pointer ${arabicFontSizeClass}`;
+            });
+            showToast(lang === 'en.asad' ? 'Font size updated' : 'Ukuran font diperbarui', 'success');
+        }
+
+        async function loadSurah(surahNumber) {
+            try {
+                document.getElementById('loading-state').classList.remove('hidden');
+                document.getElementById('content').classList.add('hidden');
+
+                const lang = localStorage.getItem('userLang') || 'id.indonesian';
+
+                const [arabRes, idRes] = await Promise.all([
+                    fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}/quran-uthmani`),
+                    fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}/${lang}`)
+                ]);
+
+                const arabData = await arabRes.json();
+                const idData = await idRes.json();
+
+                currentSurahData = arabData.data;
+                currentTranslationData = idData.data;
+
+                document.getElementById('surah-header-name').innerText = currentSurahData.englishName;
+                const ayahWord = lang === 'en.asad' ? 'AYAHS' : 'Ayat';
+                document.getElementById('surah-header-meta').innerText = `${currentSurahData.numberOfAyahs} ${ayahWord} • ${currentSurahData.revelationType}`;
+                document.getElementById('audio-surah-title').innerText = currentSurahData.englishName;
+
+                const bismillahCard = document.getElementById('bismillah-card');
+                if (surahNumber === 1 || surahNumber === 9) {
+                    bismillahCard.classList.add('hidden');
+                } else {
+                    bismillahCard.classList.remove('hidden');
+                }
+
+                renderAyahs();
+
+                const lastReadObj = {
+                    surahNumber: currentSurahData.number,
+                    surahName: `Surah ${currentSurahData.englishName}`,
+                    ayahNumber: 1
+                };
+                localStorage.setItem('lastRead', JSON.stringify(lastReadObj));
+
+            } catch(e) {
+                const lang = localStorage.getItem('userLang') || 'id.indonesian';
+                document.getElementById('loading-state').innerHTML = `<p class="text-red-500 font-medium text-xs">${lang === 'en.asad' ? 'Failed to load surah.' : 'Gagal memuat surah.'}</p>`;
+            }
+        }
+
+        function renderAyahs() {
+            const container = document.getElementById('content');
+            const savedBookmarks = localStorage.getItem('bookmarks');
+            let bookmarks = [];
+            if (savedBookmarks) { try { bookmarks = JSON.parse(savedBookmarks); } catch(e){} }
+
+            let html = '';
+            currentSurahData.ayahs.forEach((ayah, i) => {
+                let arabText = ayah.text;
+                if (currentSurahData.number !== 1 && i === 0 && arabText.startsWith('بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ')) { arabText = arabText.replace('بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ', '').trim(); }
+
+                const isBookmarked = bookmarks.some(b => b.surahNumber === currentSurahData.number && b.ayahNumber === ayah.numberInSurah);
+                const bookmarkColor = isBookmarked ? 'text-primary dark:text-emerald-400' : 'text-gray-400 hover:text-gray-600 dark:hover:text-white';
+
+                html += `
+                    <div id="ayah-${ayah.numberInSurah}" class="ayah-card bg-white dark:bg-darkcard p-5 rounded-lg border border-gray-200 dark:border-gray-800 space-y-4 transition-all duration-300">
+                        <div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-3">
+                            <div class="w-8 h-8 rounded-lg bg-orange-50 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-900 text-secondary flex items-center justify-center font-bold text-xs">
+                                ${ayah.numberInSurah}
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="toggleBookmark(${ayah.numberInSurah}, '${ayah.text.replace(/'/g, "\\'")}', '${currentTranslationData.ayahs[i].text.replace(/'/g, "\\'")}')" id="bm-btn-${ayah.numberInSurah}" class="w-8 h-8 rounded-lg bg-gray-50 dark:bg-gray-800 flex items-center justify-center ${bookmarkColor} transition">
+                                    <i class="fa-solid fa-bookmark text-xs"></i>
+                                </button>
+                                <button onclick="shareAyah(${ayah.numberInSurah}, '${currentSurahData.englishName}', '${currentTranslationData.ayahs[i].text.replace(/'/g, "\\'")}')" class="w-8 h-8 rounded-lg bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-white transition">
+                                    <i class="fa-solid fa-share-nodes text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div onclick="playAyah(${i})" class="arabic-text font-arabic font-bold text-right leading-loose text-gray-900 dark:text-white transition-all duration-200 cursor-pointer ${arabicFontSizeClass}">
+                            ${arabText}
+                        </div>
+
+                        <div class="text-gray-600 dark:text-gray-300 text-xs md:text-sm leading-relaxed pt-2 border-t border-gray-100 dark:border-gray-800/50">
+                            ${currentTranslationData.ayahs[i].text}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            document.getElementById('loading-state').classList.add('hidden');
+            container.classList.remove('hidden');
+
+            const hash = window.location.hash;
+            if (hash && hash.startsWith('#ayah-')) {
+                setTimeout(() => {
+                    const el = document.querySelector(hash);
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 500);
+            }
+        }
+
+        function playAyah(index) {
+            if (index < 0 || index >= currentSurahData.ayahs.length) return;
+            activeAyahIndex = index;
+            const ayah = currentSurahData.ayahs[index];
+
+            if (audioInstance) {
+                audioInstance.pause();
+                audioInstance.currentTime = 0;
+            }
+
+            const qari = localStorage.getItem('userQari') || 'ar.alafasy';
+            const qariNames = {
+                'ar.alafasy': 'Mishary Rashid',
+                'ar.abdulbasitmujawwad': 'Abdul Basit',
+                'ar.saadalghamidi': 'Saad Al-Ghamdi'
+            };
+            const qariLabel = qariNames[qari] || 'Mishary Rashid';
+
+            // FIXED: Ditambahkan ekstensi .mp3 agar berkas audio dari CDN Alquran Cloud dapat diputar dengan sempurna!
+            const audioUrl = `https://cdn.islamic.network/quran/audio/128/${qari}/${ayah.number}.mp3`;
+            audioInstance = new Audio(audioUrl);
+
+            const bar = document.getElementById('audio-player-bar');
+            bar.classList.remove('translate-y-full', 'opacity-0');
+
+            const lang = localStorage.getItem('userLang') || 'id.indonesian';
+            const ayahWord = lang === 'en.asad' ? 'Ayah' : 'Ayat';
+            document.getElementById('audio-ayah-label').innerText = `${ayahWord} ${ayah.numberInSurah} • ${qariLabel}`;
+            document.getElementById('audio-play-btn').innerHTML = `<i class="fa-solid fa-pause text-xs"></i>`;
+
+            document.querySelectorAll('.ayah-card').forEach(c => c.classList.remove('border-primary', 'dark:border-emerald-500', 'bg-emerald-50/20', 'dark:bg-emerald-950/20'));
+            const activeCard = document.getElementById(`ayah-${ayah.numberInSurah}`);
+            if (activeCard) {
+                activeCard.classList.add('border-primary', 'dark:border-emerald-500', 'bg-emerald-50/20', 'dark:bg-emerald-950/20');
+                activeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            const lastReadObj = {
+                surahNumber: currentSurahData.number,
+                surahName: `Surah ${currentSurahData.englishName}`,
+                ayahNumber: ayah.numberInSurah
+            };
+            localStorage.setItem('lastRead', JSON.stringify(lastReadObj));
+
+            audioInstance.play().catch(e => {
+                showToast(lang === 'en.asad' ? 'Failed to play audio. Check internet connection.' : 'Gagal memutar audio MP3. Periksa koneksi internet.', 'error');
+                document.getElementById('audio-play-btn').innerHTML = `<i class="fa-solid fa-play text-xs"></i>`;
+            });
+
+            audioInstance.ontimeupdate = () => {
+                const cur = audioInstance.currentTime;
+                const dur = audioInstance.duration || 0;
+                document.getElementById('audio-cur-time').innerText = formatTime(cur);
+                document.getElementById('audio-dur-time').innerText = formatTime(dur);
+                const progress = dur > 0 ? (cur / dur) * 100 : 0;
+                document.getElementById('audio-progress').style.width = `${progress}%`;
+            };
+
+            audioInstance.onerror = () => {
+                showToast(lang === 'en.asad' ? 'Audio file not found on CDN server.' : 'Berkas audio MP3 tidak ditemukan di server CDN.', 'error');
+                document.getElementById('audio-play-btn').innerHTML = `<i class="fa-solid fa-play text-xs"></i>`;
+            };
+
+            audioInstance.onended = () => {
+                if (activeAyahIndex < currentSurahData.ayahs.length - 1) {
+                    playAyah(activeAyahIndex + 1);
+                } else {
+                    document.getElementById('audio-play-btn').innerHTML = `<i class="fa-solid fa-play text-xs"></i>`;
+                }
+            };
+        }
+
+        function togglePlayPause() {
+            if (!audioInstance) {
+                playAyah(0);
+                return;
+            }
+            if (audioInstance.paused) {
+                audioInstance.play();
+                document.getElementById('audio-play-btn').innerHTML = `<i class="fa-solid fa-pause text-xs"></i>`;
+            } else {
+                audioInstance.pause();
+                document.getElementById('audio-play-btn').innerHTML = `<i class="fa-solid fa-play text-xs"></i>`;
+            }
+        }
+
+        function nextAyah() {
+            if (activeAyahIndex < currentSurahData.ayahs.length - 1) playAyah(activeAyahIndex + 1);
+        }
+
+        function prevAyah() {
+            if (activeAyahIndex > 0) playAyah(activeAyahIndex - 1);
+        }
+
+        function seekAudio(e) {
+            if (!audioInstance || !audioInstance.duration) return;
+            const rect = e.currentTarget.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const percentage = clickX / rect.width;
+            audioInstance.currentTime = percentage * audioInstance.duration;
+        }
+
+        function formatTime(seconds) {
+            const min = Math.floor(seconds / 60);
+            const sec = Math.floor(seconds % 60);
+            return `${min < 10 ? '0'+min : min}:${sec < 10 ? '0'+sec : sec}`;
+        }
+
+        function toggleBookmark(ayahNumberInSurah, arabText, translationText) {
+            const saved = localStorage.getItem('bookmarks');
+            let list = [];
+            if (saved) { try { list = JSON.parse(saved); } catch(e){} }
+
+            const index = list.findIndex(b => b.surahNumber === currentSurahData.number && b.ayahNumber === ayahNumberInSurah);
+            const btn = document.getElementById(`bm-btn-${ayahNumberInSurah}`);
+            const lang = localStorage.getItem('userLang') || 'id.indonesian';
+
+            if (index > -1) {
+                list.splice(index, 1);
+                btn.className = 'w-8 h-8 rounded-lg bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-white transition';
+                showToast(lang === 'en.asad' ? 'Bookmark removed' : 'Bookmark dihapus', 'info');
+            } else {
+                list.push({
+                    surahNumber: currentSurahData.number,
+                    surahName: currentSurahData.englishName,
+                    ayahNumber: ayahNumberInSurah,
+                    arab: arabText,
+                    translation: translationText
+                });
+                btn.className = 'w-8 h-8 rounded-lg bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-primary dark:text-emerald-400 transition';
+                showToast(lang === 'en.asad' ? 'Ayah saved to Bookmarks' : 'Ayat disimpan ke Bookmark', 'success');
+            }
+            localStorage.setItem('bookmarks', JSON.stringify(list));
+        }
+
+        function shareAyah(ayahNumber, surahName, translation) {
+            const textToShare = `"${translation}" (QS. ${surahName}: ${ayahNumber}) - Al-Quran Digital Premium`;
+            const lang = localStorage.getItem('userLang') || 'id.indonesian';
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(textToShare);
+                showToast(lang === 'en.asad' ? 'Translation copied to clipboard!' : 'Terjemahan disalin ke clipboard!', 'success');
+            } else {
+                showToast(lang === 'en.asad' ? 'Failed to copy text' : 'Gagal menyalin teks', 'error');
+            }
+        }
+    </script>
+</body>
+
+</html>

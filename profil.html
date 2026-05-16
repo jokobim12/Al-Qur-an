@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Al-Quran Digital - Pengaturan & Fitur Islami</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0d5c3a',
+                        'primary-light': '#158051',
+                        'primary-dark': '#0a4a2f',
+                        secondary: '#f58d37',
+                        'secondary-hover': '#e07b2b',
+                        darkbg: '#121826',
+                        darkcard: '#1f293d',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts & Custom CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body class="bg-slate-200 dark:bg-[#090d16] text-gray-800 dark:text-gray-100 font-sans transition-colors duration-300">
+
+    <!-- ==================== MOBILE APP CONTAINER ==================== -->
+    <div id="app-container">
+
+        <!-- Toast Notification Container -->
+        <div id="toast-container" class="flex flex-col gap-2 pointer-events-none"></div>
+
+        <!-- Top Header -->
+        <header class="px-4 py-4 flex items-center justify-between transition-colors border-b border-gray-200 dark:border-gray-800">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-primary dark:text-emerald-400 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-quran"></i>
+                </div>
+                <h1 class="font-bold text-xl text-primary dark:text-emerald-400 tracking-wide" data-i18n="settings_title">Settings & Tools</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleDarkMode()" class="w-10 h-10 rounded-lg bg-white dark:bg-darkcard border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-emerald-400 transition">
+                    <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
+                </button>
+                <button onclick="showToast('Tidak ada notifikasi baru', 'info')" class="w-10 h-10 rounded-lg bg-white dark:bg-darkcard border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-emerald-400 transition relative">
+                    <i class="fa-regular fa-bell text-lg"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="space-y-6 animate-fadeIn">
+
+            <!-- ==================== FITUR 1: TARGET & STATISTIK TILAWAH ==================== -->
+            <div class="bg-white dark:bg-darkcard p-5 rounded-lg border border-gray-200 dark:border-gray-800 space-y-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-primary dark:text-emerald-400 font-bold text-sm">
+                        <i class="fa-solid fa-chart-line text-base"></i>
+                        <h3 data-i18n="target_title">Target Tilawah Harian</h3>
+                    </div>
+                    <div class="bg-orange-50 dark:bg-orange-950/50 border border-orange-200 dark:border-orange-800/50 text-secondary px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1">
+                        <i class="fa-solid fa-fire"></i>
+                        <span id="streak-count-display">5 Hari Streak</span>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="flex justify-between text-xs font-semibold text-gray-600 dark:text-gray-300">
+                        <span><span data-i18n="today_progress">Progres Hari Ini</span>: <span id="progress-text" class="text-primary dark:text-emerald-400 font-bold">12 / 20 Ayat</span></span>
+                        <span id="progress-percent">60%</span>
+                    </div>
+                    <!-- Progress Bar -->
+                    <div class="w-full h-2 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-200/50 dark:border-gray-700/50">
+                        <div id="progress-bar-fill" class="h-full bg-primary dark:bg-emerald-500 rounded-lg transition-all duration-300" style="width: 60%;"></div>
+                    </div>
+                </div>
+
+                <div class="flex gap-2 pt-1">
+                    <button onclick="addProgress(5)" class="flex-1 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/50 dark:hover:bg-emerald-900/50 text-primary dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 font-semibold py-2 rounded-lg text-xs transition">
+                        +5 <span data-i18n="ayah_word">Ayat</span>
+                    </button>
+                    <button onclick="addProgress(10)" class="flex-1 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/50 dark:hover:bg-emerald-900/50 text-primary dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 font-semibold py-2 rounded-lg text-xs transition">
+                        +10 <span data-i18n="ayah_word">Ayat</span>
+                    </button>
+                    <button onclick="resetProgress()" class="bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 px-3 py-2 rounded-lg text-xs transition">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ==================== FITUR 2: KALKULATOR ZAKAT MAAL ==================== -->
+            <div class="bg-white dark:bg-darkcard p-5 rounded-lg border border-gray-200 dark:border-gray-800 space-y-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-primary dark:text-emerald-400 font-bold text-sm">
+                        <i class="fa-solid fa-calculator text-base"></i>
+                        <h3 data-i18n="zakat_title">Kalkulator Zakat Maal (2.5%)</h3>
+                    </div>
+                    <span class="text-[10px] bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-lg font-semibold border border-gray-200 dark:border-gray-700" data-i18n="zakat_nisab">Nisab 85g Emas</span>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-xs font-semibold text-gray-600 dark:text-gray-300 block" data-i18n="zakat_label">Total Harta / Tabungan (1 Tahun):</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-bold text-gray-400 dark:text-gray-500 pointer-events-none">Rp</span>
+                        <input id="zakat-input" type="number" data-i18n="zakat_placeholder" placeholder="Contoh: 10000000" oninput="calculateZakat()" class="w-full pl-9 pr-3 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-xs font-semibold text-gray-800 dark:text-gray-100 placeholder-gray-400 transition">
+                    </div>
+                </div>
+
+                <div class="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 p-3.5 rounded-lg flex items-center justify-between">
+                    <div>
+                        <p class="text-[11px] text-gray-500 dark:text-gray-400 font-medium mb-0.5" data-i18n="zakat_wajib">Wajib Zakat (2.5%):</p>
+                        <h4 id="zakat-result" class="text-base font-bold text-primary dark:text-emerald-400 font-mono">Rp 0</h4>
+                    </div>
+                    <button onclick="calculateZakat()" class="bg-primary hover:bg-primary-light text-white px-4 py-2 rounded-lg text-xs font-semibold transition" data-i18n="zakat_btn">
+                        Hitung
+                    </button>
+                </div>
+            </div>
+
+            <!-- ==================== PENGATURAN UMUM ==================== -->
+            <div class="space-y-5">
+                
+                <!-- Preferensi Tampilan -->
+                <div class="space-y-2.5">
+                    <h3 class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider pl-1" data-i18n="pref_title">Preferensi Tampilan</h3>
+                    
+                    <div class="bg-white dark:bg-darkcard rounded-lg border border-gray-200 dark:border-gray-800 divide-y divide-gray-200 dark:divide-gray-800 overflow-hidden">
+                        <!-- Dark Mode Toggle -->
+                        <div class="p-4 flex items-center justify-between">
+                            <div class="flex items-center gap-3.5 overflow-hidden">
+                                <div class="w-10 h-10 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center text-base flex-shrink-0 border border-gray-200 dark:border-gray-700">
+                                    <i class="fa-solid fa-palette text-primary dark:text-emerald-400"></i>
+                                </div>
+                                <div class="overflow-hidden">
+                                    <h4 class="font-bold text-xs text-gray-900 dark:text-white mb-0.5 truncate" data-i18n="dark_title">Mode Gelap (Dark Mode)</h4>
+                                    <p class="text-[11px] text-gray-500 dark:text-gray-400 truncate" data-i18n="dark_desc">Gunakan tema gelap</p>
+                                </div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                                <input id="dark-mode-switch" type="checkbox" class="sr-only peer" onchange="toggleDarkMode()">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-lg peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+
+                        <!-- Pilihan Bahasa Terjemahan -->
+                        <div class="p-4 flex items-center justify-between">
+                            <div class="flex items-center gap-3.5 overflow-hidden">
+                                <div class="w-10 h-10 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center text-base flex-shrink-0 border border-gray-200 dark:border-gray-700">
+                                    <i class="fa-solid fa-language text-blue-500"></i>
+                                </div>
+                                <div class="overflow-hidden">
+                                    <h4 class="font-bold text-xs text-gray-900 dark:text-white mb-0.5 truncate" data-i18n="lang_title">Bahasa Terjemahan</h4>
+                                    <p class="text-[11px] text-gray-500 dark:text-gray-400 truncate" data-i18n="lang_desc">Pilih bahasa terjemahan</p>
+                                </div>
+                            </div>
+                            <select id="lang-select" onchange="updatePreference('userLang', this.value, 'Bahasa terjemahan')" class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2.5 py-1 text-xs font-semibold text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary flex-shrink-0 max-w-[120px]">
+                                <option value="id.indonesian">Indonesia</option>
+                                <option value="en.asad">English</option>
+                            </select>
+                        </div>
+
+                        <!-- Pilihan Qari Audio -->
+                        <div class="p-4 flex items-center justify-between">
+                            <div class="flex items-center gap-3.5 overflow-hidden">
+                                <div class="w-10 h-10 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center text-base flex-shrink-0 border border-gray-200 dark:border-gray-700">
+                                    <i class="fa-solid fa-microphone-lines text-secondary"></i>
+                                </div>
+                                <div class="overflow-hidden">
+                                    <h4 class="font-bold text-xs text-gray-900 dark:text-white mb-0.5 truncate" data-i18n="qari_title">Qari Audio Tilawah</h4>
+                                    <p class="text-[11px] text-gray-500 dark:text-gray-400 truncate" data-i18n="qari_desc">Pilih suara pelantun audio</p>
+                                </div>
+                            </div>
+                            <select id="qari-select" onchange="updatePreference('userQari', this.value, 'Qari audio')" class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2.5 py-1 text-xs font-semibold text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary flex-shrink-0 max-w-[120px]">
+                                <option value="ar.alafasy">Mishary Rashid</option>
+                                <option value="ar.abdulbasitmujawwad">Abdul Basit</option>
+                                <option value="ar.saadalghamidi">Saad Al-Ghamdi</option>
+                            </select>
+                        </div>
+
+                        <!-- Metode Perhitungan Waktu Sholat -->
+                        <div class="p-4 flex items-center justify-between">
+                            <div class="flex items-center gap-3.5 overflow-hidden">
+                                <div class="w-10 h-10 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center text-base flex-shrink-0 border border-gray-200 dark:border-gray-700">
+                                    <i class="fa-solid fa-mosque text-purple-500"></i>
+                                </div>
+                                <div class="overflow-hidden">
+                                    <h4 class="font-bold text-xs text-gray-900 dark:text-white mb-0.5 truncate" data-i18n="method_title">Metode Jadwal Sholat</h4>
+                                    <p class="text-[11px] text-gray-500 dark:text-gray-400 truncate" data-i18n="method_desc">Otoritas perhitungan waktu</p>
+                                </div>
+                            </div>
+                            <select id="method-select" onchange="updatePreference('prayerMethod', this.value, 'Metode jadwal sholat')" class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2.5 py-1 text-xs font-semibold text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary flex-shrink-0 max-w-[120px]">
+                                <option value="20">Kemenag RI</option>
+                                <option value="2">ISNA (US)</option>
+                                <option value="3">MWL</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manajemen Data -->
+                <div class="space-y-2.5">
+                    <h3 class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider pl-1" data-i18n="data_title">Manajemen Data</h3>
+                    
+                    <div class="bg-white dark:bg-darkcard rounded-lg border border-gray-200 dark:border-gray-800 divide-y divide-gray-200 dark:divide-gray-800 overflow-hidden">
+                        <!-- Lihat Bookmarks -->
+                        <button onclick="openBookmarksModal()" class="w-full p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 transition text-left">
+                            <div class="flex items-center gap-3.5 overflow-hidden">
+                                <div class="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-primary dark:text-emerald-400 flex items-center justify-center text-base flex-shrink-0">
+                                    <i class="fa-solid fa-bookmark"></i>
+                                </div>
+                                <div class="overflow-hidden">
+                                    <h4 class="font-bold text-xs text-gray-900 dark:text-white mb-0.5 truncate" data-i18n="bm_title">Lihat Daftar Bookmark</h4>
+                                    <p id="settings-bm-count" class="text-[11px] text-gray-500 dark:text-gray-400 truncate">12 Ayat tersimpan</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-gray-400 text-xs flex-shrink-0"></i>
+                        </button>
+
+                        <!-- Hapus Cache -->
+                        <button onclick="clearCache()" class="w-full p-4 flex items-center justify-between hover:bg-red-50 dark:hover:bg-red-950/20 transition text-left group">
+                            <div class="flex items-center gap-3.5 overflow-hidden">
+                                <div class="w-10 h-10 rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 text-red-500 flex items-center justify-center text-base group-hover:scale-110 transition flex-shrink-0">
+                                    <i class="fa-solid fa-trash-rotate"></i>
+                                </div>
+                                <div class="overflow-hidden">
+                                    <h4 class="font-bold text-xs text-red-600 dark:text-red-400 mb-0.5 truncate" data-i18n="cache_title">Hapus Cache / Reset Data</h4>
+                                    <p class="text-[11px] text-gray-500 dark:text-gray-400 truncate" data-i18n="cache_desc">Menghapus bookmark & riwayat</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-gray-400 text-xs flex-shrink-0"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tentang Aplikasi -->
+                <div class="bg-white dark:bg-darkcard p-5 rounded-lg border border-gray-200 dark:border-gray-800 text-center space-y-1.5">
+                    <h4 class="font-bold text-sm text-gray-900 dark:text-white">Al-Quran Digital Premium</h4>
+                    <p class="text-[11px] text-gray-500 dark:text-gray-400 max-w-xs mx-auto leading-relaxed" data-i18n="about_desc">
+                        Aplikasi web Al-Quran statis dengan jadwal sholat real-time berbasis lokasi. Didukung oleh API Alquran Cloud & Aladhan.
+                    </p>
+                    <div class="pt-2">
+                        <span class="text-[9px] font-bold text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 px-2.5 py-1 rounded-lg uppercase tracking-widest border border-gray-200 dark:border-gray-700">Versi 2.0.0</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+
+        <!-- Bookmarks Modal -->
+        <div id="bookmarks-modal" class="modal-container hidden opacity-0 transition-opacity duration-300">
+            <div class="bg-white dark:bg-darkcard w-full max-w-sm rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800 flex flex-col max-h-[80vh]">
+                <div class="p-5 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-primary dark:text-emerald-400 font-bold text-base">
+                        <i class="fa-solid fa-bookmark"></i>
+                        <h3 data-i18n="bm_modal_title">Daftar Bookmark</h3>
+                    </div>
+                    <button onclick="closeBookmarksModal()" class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-gray-800 dark:hover:text-white transition border border-gray-200 dark:border-gray-700">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div id="bookmarks-modal-list" class="p-5 overflow-y-auto space-y-3 flex-1">
+                    <!-- Saved bookmarks injected here -->
+                </div>
+                <div class="p-4 border-t border-gray-200 dark:border-gray-800 text-center">
+                    <button onclick="closeBookmarksModal()" class="bg-primary hover:bg-primary-light text-white font-semibold px-6 py-2 rounded-lg text-sm transition" data-i18n="close_btn">Tutup</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM NAVIGATION BAR -->
+        <nav class="px-6 py-3 border-t border-gray-200 dark:border-gray-800 transition-colors">
+            <div class="flex items-center justify-around">
+                <a href="index.html#home" class="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-emerald-400 font-medium transition group">
+                    <i class="fa-solid fa-house text-xl group-hover:scale-110 transition"></i>
+                    <span class="text-xs font-semibold" data-i18n="home_nav">Home</span>
+                    <span class="w-1 h-1 bg-transparent rounded-lg mt-0.5"></span>
+                </a>
+                <a href="index.html#quran" class="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-emerald-400 font-medium transition group">
+                    <i class="fa-solid fa-book-open text-xl group-hover:scale-110 transition"></i>
+                    <span class="text-xs font-semibold" data-i18n="quran_nav">Quran</span>
+                    <span class="w-1 h-1 bg-transparent rounded-lg mt-0.5"></span>
+                </a>
+                <a href="index.html#prayers" class="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-emerald-400 font-medium transition group">
+                    <i class="fa-solid fa-clock text-xl group-hover:scale-110 transition"></i>
+                    <span class="text-xs font-semibold" data-i18n="prayers_nav">Prayers</span>
+                    <span class="w-1 h-1 bg-transparent rounded-lg mt-0.5"></span>
+                </a>
+                <a href="profil.html" class="flex flex-col items-center gap-1 text-primary dark:text-emerald-400 font-medium transition group">
+                    <i class="fa-solid fa-gear text-xl group-hover:scale-110 transition"></i>
+                    <span class="text-xs font-semibold" data-i18n="settings_nav">Settings</span>
+                    <span class="w-1 h-1 bg-primary dark:bg-emerald-400 rounded-lg mt-0.5"></span>
+                </a>
+            </div>
+        </nav>
+
+    </div>
+
+    <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+    <script>
+        const translations = {
+            'id.indonesian': {
+                'settings_title': 'Settings & Tools',
+                'home_nav': 'Home',
+                'quran_nav': 'Quran',
+                'prayers_nav': 'Prayers',
+                'settings_nav': 'Settings',
+                'target_title': 'Target Tilawah Harian',
+                'today_progress': 'Progres Hari Ini',
+                'ayah_word': 'Ayat',
+                'zakat_title': 'Kalkulator Zakat Maal (2.5%)',
+                'zakat_nisab': 'Nisab 85g Emas',
+                'zakat_label': 'Total Harta / Tabungan (1 Tahun):',
+                'zakat_placeholder': 'Contoh: 10000000',
+                'zakat_wajib': 'Wajib Zakat (2.5%):',
+                'zakat_btn': 'Hitung',
+                'pref_title': 'PREFERENSI TAMPILAN',
+                'dark_title': 'Mode Gelap (Dark Mode)',
+                'dark_desc': 'Gunakan tema gelap',
+                'lang_title': 'Bahasa Terjemahan',
+                'lang_desc': 'Pilih bahasa terjemahan',
+                'qari_title': 'Qari Audio Tilawah',
+                'qari_desc': 'Pilih suara pelantun audio',
+                'method_title': 'Metode Jadwal Sholat',
+                'method_desc': 'Otoritas perhitungan waktu',
+                'data_title': 'MANAJEMEN DATA',
+                'bm_title': 'Lihat Daftar Bookmark',
+                'cache_title': 'Hapus Cache / Reset Data',
+                'cache_desc': 'Menghapus bookmark & riwayat',
+                'about_desc': 'Aplikasi web Al-Quran statis dengan jadwal sholat real-time berbasis lokasi. Didukung oleh API Alquran Cloud & Aladhan.',
+                'close_btn': 'Tutup',
+                'bm_modal_title': 'Daftar Bookmark',
+                'bm_empty': 'Belum ada ayat yang di-bookmark.'
+            },
+            'en.asad': {
+                'settings_title': 'Settings & Tools',
+                'home_nav': 'Home',
+                'quran_nav': 'Quran',
+                'prayers_nav': 'Prayers',
+                'settings_nav': 'Settings',
+                'target_title': 'Daily Reading Goal',
+                'today_progress': 'Today\'s Progress',
+                'ayah_word': 'Ayahs',
+                'zakat_title': 'Zakat Maal Calculator (2.5%)',
+                'zakat_nisab': 'Nisab 85g Gold',
+                'zakat_label': 'Total Wealth / Savings (1 Year):',
+                'zakat_placeholder': 'Example: 10000000',
+                'zakat_wajib': 'Obligatory Zakat (2.5%):',
+                'zakat_btn': 'Calculate',
+                'pref_title': 'DISPLAY PREFERENCES',
+                'dark_title': 'Dark Mode',
+                'dark_desc': 'Use dark theme appearance',
+                'lang_title': 'Translation Language',
+                'lang_desc': 'Select translation language',
+                'qari_title': 'Audio Reciter (Qari)',
+                'qari_desc': 'Select audio reciter voice',
+                'method_title': 'Prayer Calculation Method',
+                'method_desc': 'Prayer time authority',
+                'data_title': 'DATA MANAGEMENT',
+                'bm_title': 'View Bookmarks List',
+                'cache_title': 'Clear Cache / Reset Data',
+                'cache_desc': 'Delete bookmarks & history',
+                'about_desc': 'Static Al-Quran web app with real-time location-based prayer times. Powered by Alquran Cloud & Aladhan API.',
+                'close_btn': 'Close',
+                'bm_modal_title': 'Bookmarks List',
+                'bm_empty': 'No bookmarked ayahs yet.'
+            }
+        };
+
+        let tilawahData = { progress: 12, goal: 20, streak: 5 };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            loadTilawahData();
+            loadPreferences();
+            applyUITranslations();
+            loadBookmarkCount();
+        });
+
+        function applyUITranslations() {
+            const lang = localStorage.getItem('userLang') || 'id.indonesian';
+            const dict = translations[lang] || translations['id.indonesian'];
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dict[key]) {
+                    if (el.tagName === 'INPUT' && el.hasAttribute('placeholder')) {
+                        el.setAttribute('placeholder', dict[key]);
+                    } else {
+                        el.innerText = dict[key];
+                    }
+                }
+            });
+
+            updateTilawahUI();
+            loadBookmarkCount();
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let bg = type === 'success' ? 'bg-emerald-600 text-white' : type === 'error' ? 'bg-red-600 text-white' : 'bg-blue-600 text-white';
+
+            toast.className = `flex items-center gap-3 px-4 py-3 rounded-lg ${bg} text-xs font-semibold animate-bounce transition-all duration-300 pointer-events-auto border border-white/10`;
+            toast.innerHTML = `
+                <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-info'} text-base"></i>
+                <span class="flex-1">${message}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const switchEl = document.getElementById('dark-mode-switch');
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+                document.getElementById('theme-icon').className = 'fa-solid fa-sun text-lg';
+                if (switchEl) switchEl.checked = true;
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('theme-icon').className = 'fa-solid fa-moon text-lg';
+                if (switchEl) switchEl.checked = false;
+            }
+        }
+
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            const theme = isDark ? 'dark' : 'light';
+            localStorage.setItem('theme', theme);
+            document.getElementById('theme-icon').className = isDark ? 'fa-solid fa-sun text-lg' : 'fa-solid fa-moon text-lg';
+            const switchEl = document.getElementById('dark-mode-switch');
+            if (switchEl) switchEl.checked = isDark;
+            
+            const lang = localStorage.getItem('userLang') || 'id.indonesian';
+            const msg = lang === 'en.asad' ? `Dark mode ${isDark ? 'enabled' : 'disabled'}` : `Mode gelap ${isDark ? 'diaktifkan' : 'dinonaktifkan'}`;
+            showToast(msg, 'info');
+        }
+
+        // Preferences Logic
+        function loadPreferences() {
+            const lang = localStorage.getItem('userLang') || 'id.indonesian';
+            const qari = localStorage.getItem('userQari') || 'ar.alafasy';
+            const method = localStorage.getItem('prayerMethod') || '20';
+
+            const langEl = document.getElementById('lang-select');
+            const qariEl = document.getElementById('qari-select');
+            const methodEl = document.getElementById('method-select');
+
+            if (langEl) langEl.value = lang;
+            if (qariEl) qariEl.value = qari;
+            if (methodEl) methodEl.value = method;
+        }
+
+        function updatePreference(key, value, label) {
+            localStorage.setItem(key, value);
+            applyUITranslations();
+            
+            const lang = localStorage.getItem('userLang') || 'id.indonesian';
+            const msg = lang === 'en.asad' ? `${label} updated successfully` : `${label} berhasil diperbarui`;
+            showToast(msg, 'success');
+        }
+
+        // Tilawah Tracker Logic
+        function loadTilawahData() {
+            const saved = localStorage.getItem('tilawahData');
+            if (saved) { try { tilawahData = JSON.parse(saved); } catch(e){} }
+            updateTilawahUI();
+        }
+
+        function updateTilawahUI() {
+            const lang = localStorage.getItem('userLang') || 'id.indonesian';
+            const streakLabel = lang === 'en.asad' ? 'Days Streak' : 'Hari Streak';
+            const ayahLabel = lang === 'en.asad' ? 'Ayahs' : 'Ayat';
+
+            document.getElementById('streak-count-display').innerText = `${tilawahData.streak} ${streakLabel}`;
+            document.getElementById('progress-text').innerText = `${tilawahData.progress} / ${tilawahData.goal} ${ayahLabel}`;
+            
+            let percent = Math.min(Math.round((tilawahData.progress / tilawahData.goal) * 100), 100);
+            document.getElementById('progress-percent').innerText = `${percent}%`;
+            document.getElementById('progress-bar-fill').style.width = `${percent}%`;
+        }
+
+        function addProgress(amount) {
+            const oldProgress = tilawahData.progress;
+            tilawahData.progress += amount;
+            const lang = localStorage.getItem('userLang') || 'id.indonesian';
+            
+            if (oldProgress < tilawahData.goal && tilawahData.progress >= tilawahData.goal) {
+                tilawahData.streak += 1;
+                const msg = lang === 'en.asad' ? 'Alhamdulillah! Daily reading goal achieved! 🔥' : 'Alhamdulillah! Target tilawah harian tercapai! 🔥';
+                showToast(msg, 'success');
+            } else {
+                const msg = lang === 'en.asad' ? `Added +${amount} ayahs to reading progress` : `Catatan tilawah ditambahkan +${amount} ayat`;
+                showToast(msg, 'success');
+            }
+
+            localStorage.setItem('tilawahData', JSON.stringify(tilawahData));
+            updateTilawahUI();
+        }
+
+        function resetProgress() {
+            tilawahData.progress = 0;
+            localStorage.setItem('tilawahData', JSON.stringify(tilawahData));
+            updateTilawahUI();
+            const lang = localStorage.getItem('userLang') || 'id.indonesian';
+            const msg = lang === 'en.asad' ? 'Today\'s reading progress reset to 0' : 'Progres tilawah hari ini diulang dari 0';
+            showToast(msg, 'info');
+        }
+
+        // Zakat Calculator Logic
+        function calculateZakat() {
+            const input = document.getElementById('zakat-input').value;
+            const amount = parseFloat(input) || 0;
+            const zakat = amount * 0.025;
+
+            const formatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(zakat);
+            document.getElementById('zakat-result').innerText = formatted;
+        }
+
+        // Bookmarks Logic
+        function loadBookmarkCount() {
+            const saved = localStorage.getItem('bookmarks');
+            let count = 0;
+            if (saved) { try { count = JSON.parse(saved).length; } catch(e){} }
+            const lang = localStorage.getItem('userLang') || 'id.indonesian';
+            const bmLabel = lang === 'en.asad' ? 'Saved Ayahs' : 'Ayat tersimpan';
+            document.getElementById('settings-bm-count').innerText = `${count} ${bmLabel}`;
+        }
+
+        function openBookmarksModal() {
+            const modal = document.getElementById('bookmarks-modal');
+            const listEl = document.getElementById('bookmarks-modal-list');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+
+            const saved = localStorage.getItem('bookmarks');
+            let list = [];
+            if (saved) { try { list = JSON.parse(saved); } catch(e){} }
+
+            const lang = localStorage.getItem('userLang') || 'id.indonesian';
+            const dict = translations[lang] || translations['id.indonesian'];
+
+            if (list.length === 0) {
+                listEl.innerHTML = `<p class="text-center py-8 text-gray-500 dark:text-gray-400 text-sm">${dict['bm_empty']}</p>`;
+                return;
+            }
+
+            listEl.innerHTML = list.map((b, i) => `
+                <div class="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-200 dark:border-gray-800 flex items-center justify-between gap-3">
+                    <div class="overflow-hidden">
+                        <h5 class="font-bold text-xs text-gray-900 dark:text-white truncate">${b.surahName} • Ayat ${b.ayahNumber}</h5>
+                        <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">${b.translation || ''}</p>
+                    </div>
+                    <div class="flex items-center gap-1.5 flex-shrink-0">
+                        <a href="baca.html?surah=${b.surahNumber}#ayah-${b.ayahNumber}" class="bg-primary hover:bg-primary-light text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition">${lang === 'en.asad' ? 'Open' : 'Buka'}</a>
+                        <button onclick="removeBookmarkIndex(${i})" class="bg-red-100 dark:bg-red-950 text-red-600 dark:text-red-400 p-2 rounded-lg hover:bg-red-200 transition"><i class="fa-solid fa-trash text-xs"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function closeBookmarksModal() {
+            const modal = document.getElementById('bookmarks-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function removeBookmarkIndex(index) {
+            const saved = localStorage.getItem('bookmarks');
+            if (saved) {
+                try {
+                    let list = JSON.parse(saved);
+                    list.splice(index, 1);
+                    localStorage.setItem('bookmarks', JSON.stringify(list));
+                    loadBookmarkCount();
+                    openBookmarksModal();
+                    const lang = localStorage.getItem('userLang') || 'id.indonesian';
+                    showToast(lang === 'en.asad' ? 'Bookmark removed successfully' : 'Bookmark berhasil dihapus', 'success');
+                } catch(e){}
+            }
+        }
+
+        function clearCache() {
+            const lang = localStorage.getItem('userLang') || 'id.indonesian';
+            const confirmMsg = lang === 'en.asad' ? 'Are you sure you want to clear all reading history and bookmarks?' : 'Apakah Anda yakin ingin menghapus seluruh riwayat bacaan dan bookmark?';
+            if (confirm(confirmMsg)) {
+                localStorage.clear();
+                loadBookmarkCount();
+                showToast(lang === 'en.asad' ? 'All cache data cleared successfully' : 'Seluruh data cache berhasil dibersihkan', 'success');
+            }
+        }
+    </script>
+</body>
+
+</html>

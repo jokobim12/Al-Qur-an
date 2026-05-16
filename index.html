@@ -1,211 +1,894 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
-    <title>Al-Qur'an Digital</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <title>Al-Quran Digital - Flat Design Mobile Experience</title>
+    
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
-
-    <style>
-        .arabic {
-            font-family: 'Amiri', serif;
-            direction: rtl;
-        }
-    </style>
-
     <script>
         tailwind.config = {
-            darkMode: 'class'
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0d5c3a',
+                        'primary-light': '#158051',
+                        'primary-dark': '#0a4a2f',
+                        secondary: '#f58d37',
+                        'secondary-hover': '#e07b2b',
+                        darkbg: '#121826',
+                        darkcard: '#1f293d',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        arabic: ['Amiri', 'serif'],
+                    }
+                }
+            }
         }
     </script>
+
+    <!-- Google Fonts & Custom CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="index.css">
 </head>
 
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition">
+<body class="bg-slate-200 dark:bg-[#090d16] text-gray-800 dark:text-gray-100 font-sans transition-colors duration-300">
 
-    <header class="sticky top-0 bg-white dark:bg-gray-800 shadow z-10">
-        <div class="max-w-5xl mx-auto px-4 py-4 flex flex-wrap gap-2 items-center justify-between">
-            <h1 class="font-semibold text-lg">Al-Qur'an</h1>
+    <!-- ==================== MOBILE APP CONTAINER ==================== -->
+    <div id="app-container">
 
-            <div class="flex gap-2 items-center">
-                <select id="mode" class="border rounded px-2 py-1 text-sm dark:bg-gray-700">
-                    <option value="juz">Per Juz</option>
-                    <option value="surah">Per Surah</option>
-                </select>
+        <!-- Toast Notification Container -->
+        <div id="toast-container" class="flex flex-col gap-2 pointer-events-none"></div>
 
-                <select id="selector" class="border rounded px-2 py-1 text-sm dark:bg-gray-700"></select>
-
-                <button id="toggleTrans" class="text-sm px-2 py-1 border rounded">
-                    Terjemahan
+        <!-- Top Header -->
+        <header class="px-4 py-4 flex items-center justify-between transition-colors border-b border-gray-200 dark:border-gray-800">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-primary dark:text-emerald-400 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-quran"></i>
+                </div>
+                <h1 class="font-bold text-xl text-primary dark:text-emerald-400 tracking-wide" data-i18n="app_title">Al-Quran</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleDarkMode()" class="w-10 h-10 rounded-lg bg-white dark:bg-darkcard border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-emerald-400 transition">
+                    <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
                 </button>
-
-                <button id="darkToggle" class="text-sm px-2 py-1 border rounded">
-                    🌙
+                <button onclick="showToast('Tidak ada notifikasi baru', 'info')" class="w-10 h-10 rounded-lg bg-white dark:bg-darkcard border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-emerald-400 transition relative">
+                    <i class="fa-regular fa-bell text-lg"></i>
+                    <span class="absolute top-2 right-2 w-2 h-2 bg-secondary rounded-lg"></span>
                 </button>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="space-y-6">
+
+            <!-- ==================== TAB 1: HOME ==================== -->
+            <section id="tab-home" class="space-y-6 animate-fadeIn">
+                <!-- Greeting -->
+                <div>
+                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase mb-1" data-i18n="greeting_sub">AS-SALAMU ALAYKUM</p>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white" data-i18n="greeting_main">Peace be upon you</h2>
+                </div>
+
+                <!-- Last Read Card -->
+                <div class="bg-gradient-to-r from-primary to-primary-light text-white rounded-lg p-6 relative overflow-hidden flex flex-col justify-between min-h-[180px]">
+                    <div class="absolute -right-6 -bottom-6 opacity-10 pointer-events-none">
+                        <i class="fa-solid fa-book-open text-9xl"></i>
+                    </div>
+                    <div class="flex items-center gap-2 text-emerald-100 text-sm font-medium mb-4">
+                        <i class="fa-solid fa-book-open-reader"></i>
+                        <span data-i18n="last_read">Last Read</span>
+                    </div>
+                    <div>
+                        <h3 id="home-last-read-surah" class="text-2xl font-bold mb-1">Surah Al-Baqarah</h3>
+                        <p id="home-last-read-ayah" class="text-emerald-100 text-sm mb-6">Ayah 255 (Ayatul Kursi)</p>
+                    </div>
+                    <div>
+                        <button onclick="continueReading()" class="bg-secondary hover:bg-secondary-hover text-white font-semibold px-6 py-2.5 rounded-lg transition duration-200 flex items-center gap-2 text-sm">
+                            <span data-i18n="continue_read">Continue Reading</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Prayer Times Section -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white" data-i18n="prayer_times">Prayer Times</h3>
+                        <div class="flex items-center gap-1 text-xs font-semibold text-primary dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-3 py-1 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                            <span id="user-location">Jakarta</span>
+                            <i class="fa-solid fa-location-dot text-xs"></i>
+                        </div>
+                    </div>
+
+                    <!-- Horizontal Prayer Cards -->
+                    <div id="prayer-cards-container" class="flex gap-3 overflow-x-auto no-scrollbar pb-2 pt-1 -mx-4 px-4">
+                        <div class="flex items-center justify-center w-full py-8 text-gray-500 dark:text-gray-400 text-sm gap-2">
+                            <i class="fa-solid fa-spinner fa-spin text-primary"></i>
+                            <span data-i18n="loading_prayers">Memuat jadwal sholat...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daily Ayah Section -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white" data-i18n="daily_ayah">Daily Ayah</h3>
+                    <div class="relative rounded-lg overflow-hidden bg-darkcard text-white min-h-[240px] flex flex-col justify-end p-6 border border-gray-700/50">
+                        <img src="https://images.unsplash.com/photo-1564507592333-c60657eea523?q=80&w=1000&auto=format&fit=crop" alt="Mosque Arch" class="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none">
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/80 to-transparent pointer-events-none"></div>
+                        
+                        <div class="relative z-10 flex flex-col items-center text-center space-y-4 my-auto py-4">
+                            <div class="w-10 h-10 rounded-lg bg-secondary text-white flex items-center justify-center font-bold text-lg">
+                                99
+                            </div>
+                            <p class="text-base font-medium italic leading-relaxed px-2 text-gray-100">
+                                "Allah does not burden a soul beyond that it can bear..."
+                            </p>
+                            <div class="flex items-center gap-3 w-full justify-center pt-2">
+                                <div class="h-[1px] w-8 bg-secondary"></div>
+                                <span class="text-[10px] font-bold tracking-widest uppercase text-secondary">AL-BAQARAH: 286</span>
+                                <div class="h-[1px] w-8 bg-secondary"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Action Grid -->
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="openBookmarksModal()" class="bg-white dark:bg-darkcard p-4 rounded-lg border border-gray-200 dark:border-gray-800 flex items-center gap-3 hover:border-primary dark:hover:border-emerald-500 transition group text-left">
+                        <div class="w-11 h-11 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-primary dark:text-emerald-400 flex items-center justify-center text-lg group-hover:scale-110 transition duration-200 flex-shrink-0">
+                            <i class="fa-solid fa-bookmark"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <h4 class="font-bold text-sm text-gray-900 dark:text-white mb-0.5 truncate" data-i18n="bm_modal_title">Bookmarks</h4>
+                            <p id="bookmark-count-txt" class="text-xs text-gray-500 dark:text-gray-400 truncate">12 Saved</p>
+                        </div>
+                    </button>
+
+                    <button onclick="switchTab('prayers')" class="bg-white dark:bg-darkcard p-4 rounded-lg border border-gray-200 dark:border-gray-800 flex items-center gap-3 hover:border-primary dark:hover:border-emerald-500 transition group text-left">
+                        <div class="w-11 h-11 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-primary dark:text-emerald-400 flex items-center justify-center text-lg group-hover:scale-110 transition duration-200 flex-shrink-0">
+                            <i class="fa-solid fa-compass"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <h4 class="font-bold text-sm text-gray-900 dark:text-white mb-0.5 truncate" data-i18n="qibla_dir">Qibla</h4>
+                            <p id="qibla-deg-txt" class="text-xs text-gray-500 dark:text-gray-400 truncate">294° NW</p>
+                        </div>
+                    </button>
+                </div>
+            </section>
+
+
+            <!-- ==================== TAB 2: QURAN (SURAH LIST) ==================== -->
+            <section id="tab-quran" class="space-y-6 hidden animate-fadeIn">
+                <!-- Mini Last Read Banner -->
+                <div onclick="continueReading()" class="bg-primary text-white p-4 rounded-lg flex items-center justify-between cursor-pointer hover:bg-primary-light transition group">
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <div class="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center text-xl group-hover:scale-110 transition flex-shrink-0">
+                            <i class="fa-solid fa-book-open"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <p class="text-xs text-emerald-200 font-medium mb-0.5 truncate" data-i18n="last_read">Last Read</p>
+                            <h4 id="quran-last-read-surah" class="font-bold text-base truncate">Al-Baqarah</h4>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-lg text-xs font-semibold flex-shrink-0">
+                        <i class="fa-solid fa-book-bookmark text-emerald-300"></i>
+                        <span id="quran-last-read-ayah">Ayah No: 155</span>
+                    </div>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 dark:text-gray-500">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                    <input id="search-surah-input" type="text" data-i18n="search_placeholder" placeholder="Search Surah, Juz, or Ayah" class="w-full pl-11 pr-4 py-3.5 bg-white dark:bg-darkcard border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-emerald-500 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition">
+                </div>
+
+                <!-- Surah List Section -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white" data-i18n="surah_list">Surah List</h3>
+                        <button onclick="resetSearch()" class="text-xs font-bold text-primary dark:text-emerald-400 hover:underline flex items-center gap-1">
+                            <span data-i18n="view_all">View All</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="surah-loading" class="py-12 text-center text-gray-500 dark:text-gray-400 space-y-3">
+                        <i class="fa-solid fa-spinner fa-spin text-3xl text-primary"></i>
+                        <p class="text-sm font-medium" data-i18n="loading_surah">Memuat daftar Surah...</p>
+                    </div>
+
+                    <!-- Surah Grid/List -->
+                    <div id="surah-list-container" class="grid grid-cols-1 gap-3 hidden">
+                        <!-- Surah cards injected here -->
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ==================== TAB 3: PRAYERS ==================== -->
+            <section id="tab-prayers" class="space-y-6 hidden animate-fadeIn">
+                <!-- Next Prayer Countdown Card -->
+                <div class="bg-primary text-white p-6 rounded-lg text-center relative overflow-hidden">
+                    <div class="absolute -right-10 -top-10 opacity-10 pointer-events-none">
+                        <i class="fa-solid fa-mosque text-9xl"></i>
+                    </div>
+                    <p class="text-xs font-bold tracking-widest text-emerald-200 uppercase mb-2"><span data-i18n="next_prayer">NEXT PRAYER</span>: <span id="next-prayer-name">ASR</span></p>
+                    <h2 id="countdown-timer" class="text-4xl font-extrabold tracking-tight mb-2 font-mono">02:45:12</h2>
+                    <p class="text-xs text-emerald-100 mb-6 font-medium" data-i18n="remaining_time">Remaining until call to prayer</p>
+                    
+                    <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-lg text-xs font-semibold border border-white/10 max-w-full overflow-hidden">
+                        <i class="fa-solid fa-location-dot text-secondary flex-shrink-0"></i>
+                        <span id="prayers-location-txt" class="truncate">London, United Kingdom</span>
+                    </div>
+                </div>
+
+                <!-- Daily Prayers List -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white" data-i18n="daily_prayers">Daily Prayers</h3>
+                    <div id="daily-prayers-container" class="space-y-3">
+                        <div class="py-8 text-center text-gray-500 dark:text-gray-400 text-sm">
+                            <i class="fa-solid fa-spinner fa-spin text-primary mr-2"></i> <span data-i18n="loading_prayers">Memuat jadwal sholat...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Qibla Direction Card -->
+                <div class="bg-white dark:bg-darkcard p-6 rounded-lg border border-gray-200 dark:border-gray-800 space-y-6 text-center relative overflow-hidden">
+                    <div class="flex items-center justify-between text-left">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-0.5" data-i18n="qibla_dir">Qibla Direction</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400" data-i18n="qibla_desc">Align your device to find the Kaaba</p>
+                        </div>
+                        <div class="text-right">
+                            <h4 id="qibla-degree-display" class="font-bold text-base text-primary dark:text-emerald-400">128° SE</h4>
+                            <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Magnetic</p>
+                        </div>
+                    </div>
+
+                    <!-- Compass Visual -->
+                    <div class="relative w-44 h-44 mx-auto flex items-center justify-center my-4">
+                        <!-- Compass Outer Ring -->
+                        <div class="absolute inset-0 rounded-lg border-4 border-dashed border-emerald-100 dark:border-emerald-950 flex items-center justify-center">
+                            <span class="absolute top-2 text-xs font-bold text-gray-400">N</span>
+                            <span class="absolute bottom-2 text-xs font-bold text-gray-400">S</span>
+                            <span class="absolute left-2 text-xs font-bold text-gray-400">W</span>
+                            <span class="absolute right-2 text-xs font-bold text-gray-400">E</span>
+                        </div>
+                        <!-- Compass Needle / Kaaba Pointer -->
+                        <div id="compass-needle" class="absolute w-full h-full flex items-center justify-center transition-transform duration-1000 ease-out" style="transform: rotate(128deg);">
+                            <div class="w-1 h-26 bg-primary dark:bg-emerald-500 rounded-lg relative">
+                                <div class="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-darkcard dark:bg-white border-2 border-secondary rounded-lg flex items-center justify-center transform -rotate-45">
+                                    <i class="fa-solid fa-kaaba text-secondary text-base transform rotate-45"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Center Pivot -->
+                        <div class="w-4 h-4 rounded-lg bg-secondary z-10 border-2 border-white dark:border-darkcard"></div>
+                    </div>
+
+                    <button onclick="calibrateQibla()" class="bg-primary hover:bg-primary-light text-white font-semibold px-6 py-2.5 rounded-lg transition duration-200 text-sm w-full" data-i18n="calibrate_btn">
+                        Calibrate Sensor
+                    </button>
+                </div>
+            </section>
+
+        </main>
+
+
+        <!-- Bookmarks Modal -->
+        <div id="bookmarks-modal" class="modal-container hidden opacity-0 transition-opacity duration-300">
+            <div class="bg-white dark:bg-darkcard w-full max-w-sm rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800 flex flex-col max-h-[80vh]">
+                <div class="p-5 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-primary dark:text-emerald-400 font-bold text-base">
+                        <i class="fa-solid fa-bookmark"></i>
+                        <h3 data-i18n="bm_modal_title">Daftar Bookmark</h3>
+                    </div>
+                    <button onclick="closeBookmarksModal()" class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-gray-800 dark:hover:text-white transition border border-gray-200 dark:border-gray-700">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div id="bookmarks-modal-list" class="p-5 overflow-y-auto space-y-3 flex-1">
+                    <!-- Saved bookmarks injected here -->
+                </div>
+                <div class="p-4 border-t border-gray-200 dark:border-gray-800 text-center">
+                    <button onclick="closeBookmarksModal()" class="bg-primary hover:bg-primary-light text-white font-semibold px-6 py-2 rounded-lg text-sm transition" data-i18n="close_btn">Tutup</button>
+                </div>
             </div>
         </div>
 
-        <div class="max-w-5xl mx-auto px-4 pb-3">
-            <input id="search" placeholder="Cari ayat…"
-                class="w-full px-3 py-2 border rounded text-sm dark:bg-gray-700">
-        </div>
-    </header>
+        <!-- BOTTOM NAVIGATION BAR -->
+        <nav class="px-6 py-3 border-t border-gray-200 dark:border-gray-800 transition-colors">
+            <div class="flex items-center justify-around">
+                <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center gap-1 text-primary dark:text-emerald-400 font-medium transition group">
+                    <i class="fa-solid fa-house text-xl group-hover:scale-110 transition"></i>
+                    <span class="text-xs font-semibold" data-i18n="home_nav">Home</span>
+                    <span class="w-1 h-1 bg-primary dark:bg-emerald-400 rounded-lg mt-0.5 nav-dot"></span>
+                </button>
+                <button onclick="switchTab('quran')" id="nav-quran" class="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-emerald-400 font-medium transition group">
+                    <i class="fa-solid fa-book-open text-xl group-hover:scale-110 transition"></i>
+                    <span class="text-xs font-semibold" data-i18n="quran_nav">Quran</span>
+                    <span class="w-1 h-1 bg-transparent rounded-lg mt-0.5 nav-dot"></span>
+                </button>
+                <button onclick="switchTab('prayers')" id="nav-prayers" class="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-emerald-400 font-medium transition group">
+                    <i class="fa-solid fa-clock text-xl group-hover:scale-110 transition"></i>
+                    <span class="text-xs font-semibold" data-i18n="prayers_nav">Prayers</span>
+                    <span class="w-1 h-1 bg-transparent rounded-lg mt-0.5 nav-dot"></span>
+                </button>
+                <a href="profil.html" id="nav-settings" class="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-emerald-400 font-medium transition group">
+                    <i class="fa-solid fa-gear text-xl group-hover:scale-110 transition"></i>
+                    <span class="text-xs font-semibold" data-i18n="settings_nav">Settings</span>
+                    <span class="w-1 h-1 bg-transparent rounded-lg mt-0.5 nav-dot"></span>
+                </a>
+            </div>
+        </nav>
 
-    <main class="max-w-5xl mx-auto px-4 py-6">
-        <div id="loading" class="text-center py-10 text-gray-500">Memuat…</div>
-        <div id="content" class="space-y-10 hidden"></div>
-    </main>
+    </div>
 
+    <!-- ==================== JAVASCRIPT LOGIC ==================== -->
     <script>
-        const modeEl = document.getElementById('mode');
-        const selector = document.getElementById('selector');
-        const content = document.getElementById('content');
-        const loading = document.getElementById('loading');
-        const toggleTrans = document.getElementById('toggleTrans');
-        const darkToggle = document.getElementById('darkToggle');
-        const searchInput = document.getElementById('search');
+        const translations = {
+            'id.indonesian': {
+                'app_title': 'Al-Quran',
+                'greeting_sub': 'AS-SALAMU ALAYKUM',
+                'greeting_main': 'Peace be upon you',
+                'last_read': 'Terakhir Dibaca',
+                'continue_read': 'Lanjutkan Membaca',
+                'prayer_times': 'Jadwal Sholat',
+                'daily_ayah': 'Ayat Harian',
+                'search_placeholder': 'Cari Surah, Juz, atau Ayat',
+                'surah_list': 'Daftar Surah',
+                'view_all': 'Lihat Semua',
+                'next_prayer': 'SHOLAT BERIKUTNYA',
+                'remaining_time': 'Tersisa menuju waktu sholat',
+                'daily_prayers': 'Sholat Harian',
+                'qibla_dir': 'Arah Kiblat',
+                'qibla_desc': 'Arahkan perangkat untuk menemukan Kaaba',
+                'calibrate_btn': 'Kalibrasi Sensor',
+                'loading_prayers': 'Memuat jadwal sholat...',
+                'loading_surah': 'Memuat daftar Surah...',
+                'fajr': 'Subuh',
+                'dhuhr': 'Dzuhur',
+                'asr': 'Ashar',
+                'maghrib': 'Maghrib',
+                'isha': 'Isya',
+                'home_nav': 'Home',
+                'quran_nav': 'Quran',
+                'prayers_nav': 'Prayers',
+                'settings_nav': 'Settings',
+                'bm_modal_title': 'Daftar Bookmark',
+                'close_btn': 'Tutup',
+                'bm_empty': 'Belum ada ayat yang di-bookmark.',
+                'saved_word': 'Tersimpan'
+            },
+            'en.asad': {
+                'app_title': 'Al-Quran',
+                'greeting_sub': 'AS-SALAMU ALAYKUM',
+                'greeting_main': 'Peace be upon you',
+                'last_read': 'Last Read',
+                'continue_read': 'Continue Reading',
+                'prayer_times': 'Prayer Times',
+                'daily_ayah': 'Daily Ayah',
+                'search_placeholder': 'Search Surah, Juz, or Ayah',
+                'surah_list': 'Surah List',
+                'view_all': 'View All',
+                'next_prayer': 'NEXT PRAYER',
+                'remaining_time': 'Remaining until call to prayer',
+                'daily_prayers': 'Daily Prayers',
+                'qibla_dir': 'Qibla Direction',
+                'qibla_desc': 'Align your device to find the Kaaba',
+                'calibrate_btn': 'Calibrate Sensor',
+                'loading_prayers': 'Loading prayer times...',
+                'loading_surah': 'Loading Surah list...',
+                'fajr': 'Fajr',
+                'dhuhr': 'Dhuhr',
+                'asr': 'Asr',
+                'mag-hrib': 'Maghrib',
+                'isha': 'Isha',
+                'home_nav': 'Home',
+                'quran_nav': 'Quran',
+                'prayers_nav': 'Prayers',
+                'settings_nav': 'Settings',
+                'bm_modal_title': 'Bookmarks List',
+                'close_btn': 'Close',
+                'bm_empty': 'No bookmarked ayahs yet.',
+                'saved_word': 'Saved'
+            }
+        };
 
-        let showTranslation = true;
-        let allAyahs = [];
         let surahList = [];
+        let prayerTimings = null;
+        let qiblaDeg = 288;
+        let countdownInterval = null;
 
-        async function fetchJSON(url) {
-            const res = await fetch(url);
-            if (!res.ok) throw new Error('API error');
-            return res.json();
-        }
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            loadLastReadData();
+            loadPrayerTimes();
+            loadSurahList();
+            initSearch();
+            applyUITranslations();
+            loadBookmarkCount();
 
-        // DARK MODE
-        darkToggle.onclick = () => {
-            document.documentElement.classList.toggle('dark');
-        };
+            const hash = window.location.hash.replace('#', '');
+            if (['home', 'quran', 'prayers'].includes(hash)) {
+                switchTab(hash);
+            }
+        });
 
-        // TOGGLE TERJEMAHAN
-        toggleTrans.onclick = () => {
-            showTranslation = !showTranslation;
-            document.querySelectorAll('.translation').forEach(el => {
-                el.classList.toggle('hidden', !showTranslation);
-            });
-        };
+        function applyUITranslations() {
+            const lang = localStorage.getItem('userLang') || 'id.indonesian';
+            const dict = translations[lang] || translations['id.indonesian'];
 
-        // LOAD SURAH LIST (NAMA ASLI)
-        async function loadSurahList() {
-            const data = await fetchJSON('https://api.alquran.cloud/v1/surah');
-            surahList = data.data;
-        }
-
-        // POPULATE SELECT
-        async function populateSelector() {
-            selector.innerHTML = '';
-
-            if (modeEl.value === 'juz') {
-                for (let i = 1; i <= 30; i++) {
-                    selector.innerHTML += `<option value="${i}">Juz ${i}</option>`;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dict[key]) {
+                    if (el.tagName === 'INPUT' && el.hasAttribute('placeholder')) {
+                        el.setAttribute('placeholder', dict[key]);
+                    } else {
+                        el.innerText = dict[key];
+                    }
                 }
+            });
+
+            if (prayerTimings) {
+                renderPrayerCards();
+                renderDailyPrayers();
+            }
+            loadBookmarkCount();
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let bg = type === 'success' ? 'bg-emerald-600 text-white' : type === 'error' ? 'bg-red-600 text-white' : 'bg-blue-600 text-white';
+
+            toast.className = `flex items-center gap-3 px-4 py-3 rounded-lg ${bg} text-xs font-semibold animate-bounce transition-all duration-300 pointer-events-auto border border-white/10`;
+            toast.innerHTML = `
+                <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-info'} text-base"></i>
+                <span class="flex-1">${message}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+                document.getElementById('theme-icon').className = 'fa-solid fa-sun text-lg';
             } else {
-                if (!surahList.length) await loadSurahList();
-                surahList.forEach(s => {
-                    selector.innerHTML += `
-        <option value="${s.number}">
-          ${s.number}. ${s.name} (${s.englishName})
-        </option>
-      `;
-                });
+                document.documentElement.classList.remove('dark');
+                document.getElementById('theme-icon').className = 'fa-solid fa-moon text-lg';
             }
         }
 
-        // LOAD CONTENT
-        async function loadContent() {
-            loading.classList.remove('hidden');
-            content.classList.add('hidden');
-            content.innerHTML = '';
-            allAyahs = [];
-
-            let arabUrl, idUrl;
-
-            if (modeEl.value === 'juz') {
-                arabUrl = `https://api.alquran.cloud/v1/juz/${selector.value}/quran-uthmani`;
-                idUrl = `https://api.alquran.cloud/v1/juz/${selector.value}/id.indonesian`;
-            } else {
-                arabUrl = `https://api.alquran.cloud/v1/surah/${selector.value}/quran-uthmani`;
-                idUrl = `https://api.alquran.cloud/v1/surah/${selector.value}/id.indonesian`;
-            }
-
-            const [arab, id] = await Promise.all([
-                fetchJSON(arabUrl),
-                fetchJSON(idUrl)
-            ]);
-
-            let currentSurah = null;
-
-            arab.data.ayahs.forEach((ayah, i) => {
-                if (ayah.surah.name !== currentSurah) {
-                    currentSurah = ayah.surah.name;
-                    content.innerHTML += `
-        <div class="text-center border-b pb-4">
-          <h2 class="arabic text-3xl">${ayah.surah.name}</h2>
-          <p class="text-sm text-gray-500">
-            ${ayah.surah.englishName} • ${ayah.surah.numberOfAyahs} Ayat
-          </p>
-        </div>
-      `;
-                }
-
-                content.innerHTML += `
-      <div class="ayah border-b pb-6 space-y-2">
-        <div class="arabic text-2xl leading-loose text-right cursor-pointer"
-          onclick="new Audio('https://cdn.islamic.network/quran/audio/128/ar.alafasy/${ayah.number}').play()">
-          ${ayah.text}
-          <span class="text-sm text-gray-400">(${ayah.numberInSurah})</span>
-        </div>
-        <div class="translation text-sm text-gray-600 dark:text-gray-400">
-          ${id.data.ayahs[i].text}
-        </div>
-      </div>
-    `;
-
-                allAyahs.push({
-                    arab: ayah.text,
-                    id: id.data.ayahs[i].text.toLowerCase()
-                });
-            });
-
-            loading.classList.add('hidden');
-            content.classList.remove('hidden');
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            const theme = isDark ? 'dark' : 'light';
+            localStorage.setItem('theme', theme);
+            document.getElementById('theme-icon').className = isDark ? 'fa-solid fa-sun text-lg' : 'fa-solid fa-moon text-lg';
+            
+            const lang = localStorage.getItem('userLang') || 'id.indonesian';
+            showToast(lang === 'en.asad' ? `Dark mode ${isDark ? 'enabled' : 'disabled'}` : `Mode gelap ${isDark ? 'diaktifkan' : 'dinonaktifkan'}`, 'info');
         }
 
-        // SEARCH
-        searchInput.oninput = () => {
-            const q = searchInput.value.toLowerCase();
-            document.querySelectorAll('.ayah').forEach((el, i) => {
-                el.classList.toggle(
-                    'hidden',
-                    !allAyahs[i].arab.includes(q) && !allAyahs[i].id.includes(q)
+        function switchTab(tabId) {
+            const tabs = ['home', 'quran', 'prayers'];
+
+            tabs.forEach(t => {
+                const section = document.getElementById(`tab-${t}`);
+                const navBtn = document.getElementById(`nav-${t}`);
+                const dot = navBtn.querySelector('.nav-dot');
+
+                if (t === tabId) {
+                    section.classList.remove('hidden');
+                    navBtn.className = 'flex flex-col items-center gap-1 text-primary dark:text-emerald-400 font-medium transition group';
+                    dot.className = 'w-1 h-1 bg-primary dark:bg-emerald-400 rounded-lg mt-0.5 nav-dot';
+                } else {
+                    section.classList.add('hidden');
+                    navBtn.className = 'flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-emerald-400 font-medium transition group';
+                    dot.className = 'w-1 h-1 bg-transparent rounded-lg mt-0.5 nav-dot';
+                }
+            });
+
+            window.location.hash = tabId;
+            const mainEl = document.querySelector('main');
+            if (mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function loadLastReadData() {
+            const saved = localStorage.getItem('lastRead');
+            let surahName = 'Surah Al-Baqarah';
+            let ayahStr = 'Ayah 255 (Ayatul Kursi)';
+
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    surahName = data.surahName || surahName;
+                    ayahStr = `Ayah No: ${data.ayahNumber}` || ayahStr;
+                } catch(e){}
+            }
+
+            document.getElementById('home-last-read-surah').innerText = surahName;
+            document.getElementById('home-last-read-ayah').innerText = ayahStr;
+            document.getElementById('quran-last-read-surah').innerText = surahName.replace('Surah ', '');
+            document.getElementById('quran-last-read-ayah').innerText = ayahStr;
+        }
+
+        function continueReading() {
+            const saved = localStorage.getItem('lastRead');
+            let surahNum = 2;
+            if (saved) {
+                try { surahNum = JSON.parse(saved).surahNumber || 2; } catch(e){}
+            }
+            window.location.href = `baca.html?surah=${surahNum}`;
+        }
+
+        function loadBookmarkCount() {
+            const saved = localStorage.getItem('bookmarks');
+            let count = 0;
+            if (saved) { try { count = JSON.parse(saved).length; } catch(e){} }
+            const lang = localStorage.getItem('userLang') || 'id.indonesian';
+            const savedWord = lang === 'en.asad' ? 'Saved' : 'Tersimpan';
+            document.getElementById('bookmark-count-txt').innerText = `${count} ${savedWord}`;
+        }
+
+        function openBookmarksModal() {
+            const modal = document.getElementById('bookmarks-modal');
+            const listEl = document.getElementById('bookmarks-modal-list');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+
+            const saved = localStorage.getItem('bookmarks');
+            let list = [];
+            if (saved) { try { list = JSON.parse(saved); } catch(e){} }
+
+            const lang = localStorage.getItem('userLang') || 'id.indonesian';
+            const dict = translations[lang] || translations['id.indonesian'];
+
+            if (list.length === 0) {
+                listEl.innerHTML = `<p class="text-center py-8 text-gray-500 dark:text-gray-400 text-sm">${dict['bm_empty']}</p>`;
+                return;
+            }
+
+            listEl.innerHTML = list.map((b, i) => `
+                <div class="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-200 dark:border-gray-800 flex items-center justify-between gap-3">
+                    <div class="overflow-hidden">
+                        <h5 class="font-bold text-xs text-gray-900 dark:text-white truncate">${b.surahName} • Ayat ${b.ayahNumber}</h5>
+                        <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">${b.translation || ''}</p>
+                    </div>
+                    <div class="flex items-center gap-1.5 flex-shrink-0">
+                        <a href="baca.html?surah=${b.surahNumber}#ayah-${b.ayahNumber}" class="bg-primary hover:bg-primary-light text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition">${lang === 'en.asad' ? 'Open' : 'Buka'}</a>
+                        <button onclick="removeBookmarkIndex(${i})" class="bg-red-100 dark:bg-red-950 text-red-600 dark:text-red-400 p-2 rounded-lg hover:bg-red-200 transition"><i class="fa-solid fa-trash text-xs"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function closeBookmarksModal() {
+            const modal = document.getElementById('bookmarks-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function removeBookmarkIndex(index) {
+            const saved = localStorage.getItem('bookmarks');
+            if (saved) {
+                try {
+                    let list = JSON.parse(saved);
+                    list.splice(index, 1);
+                    localStorage.setItem('bookmarks', JSON.stringify(list));
+                    loadBookmarkCount();
+                    openBookmarksModal();
+                    const lang = localStorage.getItem('userLang') || 'id.indonesian';
+                    showToast(lang === 'en.asad' ? 'Bookmark removed successfully' : 'Bookmark berhasil dihapus', 'success');
+                } catch(e){}
+            }
+        }
+
+        function loadPrayerTimes() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        fetchPrayerAPI(lat, lng);
+                        fetchLocationName(lat, lng);
+                    },
+                    error => {
+                        fetchPrayerAPI(-6.2088, 106.8456);
+                        document.getElementById('user-location').innerText = 'Jakarta (Default)';
+                        document.getElementById('prayers-location-txt').innerText = 'Jakarta, Indonesia';
+                        const lang = localStorage.getItem('userLang') || 'id.indonesian';
+                        showToast(lang === 'en.asad' ? 'Location access disabled. Showing Jakarta times.' : 'Akses lokasi dinonaktifkan. Menampilkan jadwal Jakarta.', 'info');
+                    }
                 );
+            } else {
+                fetchPrayerAPI(-6.2088, 106.8456);
+            }
+        }
+
+        async function fetchLocationName(lat, lng) {
+            try {
+                const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=id`);
+                const data = await res.json();
+                const city = data.city || data.locality || 'Lokasi Anda';
+                const country = data.countryName || 'Indonesia';
+
+                document.getElementById('user-location').innerText = city;
+                document.getElementById('prayers-location-txt').innerText = `${city}, ${country}`;
+            } catch(e){}
+        }
+
+        async function fetchPrayerAPI(lat, lng, retryMethod = null) {
+            try {
+                const method = retryMethod || localStorage.getItem('prayerMethod') || '20';
+                const now = new Date();
+                const dd = String(now.getDate()).padStart(2, '0');
+                const mm = String(now.getMonth() + 1).padStart(2, '0');
+                const yyyy = now.getFullYear();
+                const dateStr = `${dd}-${mm}-${yyyy}`;
+
+                let res = await fetch(`https://api.aladhan.com/v1/timings/${dateStr}?latitude=${lat}&longitude=${lng}&method=${method}`);
+                let data = await res.json();
+                
+                if (data.code !== 200 && !retryMethod) {
+                    // Fallback otomatis ke metode 3 (MWL) jika metode 20 sedang tidak didukung di server edge API Aladhan
+                    res = await fetch(`https://api.aladhan.com/v1/timings/${dateStr}?latitude=${lat}&longitude=${lng}&method=3`);
+                    data = await res.json();
+                }
+
+                if (data.code !== 200) {
+                    throw new Error(data.data || 'API Error');
+                }
+                
+                prayerTimings = data.data.timings;
+                qiblaDeg = Math.round(data.data.meta.qibla);
+
+                document.getElementById('qibla-deg-txt').innerText = `${qiblaDeg}° NW`;
+                document.getElementById('qibla-degree-display').innerText = `${qiblaDeg}° SE`;
+                document.getElementById('compass-needle').style.transform = `rotate(${qiblaDeg}deg)`;
+
+                renderPrayerCards();
+                renderDailyPrayers();
+                startNextPrayerCountdown();
+            } catch(e){
+                const lang = localStorage.getItem('userLang') || 'id.indonesian';
+                document.getElementById('prayer-cards-container').innerHTML = `<p class="text-red-500 text-xs py-4">${lang === 'en.asad' ? 'Failed to load prayer times.' : 'Gagal memuat jadwal sholat.'}</p>`;
+            }
+        }
+
+        function renderPrayerCards() {
+            const container = document.getElementById('prayer-cards-container');
+            const lang = localStorage.getItem('userLang') || 'id.indonesian';
+            const dict = translations[lang] || translations['id.indonesian'];
+
+            const prayers = [
+                { name: 'Fajr', label: dict['fajr'], time: prayerTimings.Fajr },
+                { name: 'Dhuhr', label: dict['dhuhr'], time: prayerTimings.Dhuhr },
+                { name: 'Asr', label: dict['asr'], time: prayerTimings.Asr },
+                { name: 'Maghrib', label: dict['maghrib'], time: prayerTimings.Maghrib },
+                { name: 'Isha', label: dict['isha'], time: prayerTimings.Isha }
+            ];
+
+            const nextPrayer = getNextPrayer();
+
+            container.innerHTML = prayers.map(p => {
+                const isNext = nextPrayer && nextPrayer.name === p.name;
+                const bg = isNext ? 'bg-primary text-white border-primary' : 'bg-white dark:bg-darkcard text-gray-800 dark:text-gray-100 border-gray-200 dark:border-gray-800';
+                const labelColor = isNext ? 'text-emerald-200' : 'text-gray-500 dark:text-gray-400';
+
+                return `
+                    <div class="flex-shrink-0 w-28 rounded-lg p-4 border flex flex-col items-center text-center transition-all duration-300 ${bg}">
+                        <p class="text-xs font-semibold mb-1 ${labelColor}">${p.label}</p>
+                        <h4 class="text-lg font-bold mb-1.5 font-mono">${p.time}</h4>
+                        ${isNext ? `<span class="text-[10px] font-bold bg-white/20 px-2.5 py-0.5 rounded-lg text-white">Next</span>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderDailyPrayers() {
+            const container = document.getElementById('daily-prayers-container');
+            const lang = localStorage.getItem('userLang') || 'id.indonesian';
+            const dict = translations[lang] || translations['id.indonesian'];
+
+            const prayers = [
+                { name: 'Fajr', label: dict['fajr'], time: prayerTimings.Fajr, icon: 'fa-sun-plant-wilt' },
+                { name: 'Dhuhr', label: dict['dhuhr'], time: prayerTimings.Dhuhr, icon: 'fa-sun' },
+                { name: 'Asr', label: dict['asr'], time: prayerTimings.Asr, icon: 'fa-cloud-sun' },
+                { name: 'Maghrib', label: dict['maghrib'], time: prayerTimings.Maghrib, icon: 'fa-sunset' },
+                { name: 'Isha', label: dict['isha'], time: prayerTimings.Isha, icon: 'fa-moon' }
+            ];
+
+            const nextPrayer = getNextPrayer();
+
+            container.innerHTML = prayers.map(p => {
+                const isNext = nextPrayer && nextPrayer.name === p.name;
+                const time12 = formatTime12(p.time);
+
+                return `
+                    <div class="bg-white dark:bg-darkcard p-4 rounded-lg border border-gray-200 dark:border-gray-800 flex items-center justify-between hover:border-primary dark:hover:border-emerald-500 transition">
+                        <div class="flex items-center gap-3.5 overflow-hidden">
+                            <div class="w-11 h-11 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-primary dark:text-emerald-400 flex items-center justify-center text-lg flex-shrink-0">
+                                <i class="fa-solid ${p.icon}"></i>
+                            </div>
+                            <div class="overflow-hidden">
+                                <h4 class="font-bold text-gray-900 dark:text-white text-sm mb-0.5 truncate">${p.label}</h4>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 font-mono truncate">${time12}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2.5 flex-shrink-0">
+                            ${isNext ? `<span class="bg-emerald-100 dark:bg-emerald-950 text-primary dark:text-emerald-400 text-xs font-bold px-3 py-1 rounded-lg">Next</span>` : ''}
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" ${isNext || p.name==='Fajr' || p.name==='Maghrib' || p.name==='Isha' ? 'checked' : ''} onchange="showToast('${lang === 'en.asad' ? 'Prayer notification updated' : 'Pengaturan notifikasi sholat diperbarui'}', 'success')">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-lg peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-lg after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function formatTime12(time24) {
+            const [h, m] = time24.split(':');
+            let hours = parseInt(h);
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            return `${hours < 10 ? '0'+hours : hours}:${m} ${ampm}`;
+        }
+
+        function getNextPrayer() {
+            if (!prayerTimings) return null;
+            const now = new Date();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+            const prayers = [
+                { name: 'Fajr', time: prayerTimings.Fajr },
+                { name: 'Dhuhr', time: prayerTimings.Dhuhr },
+                { name: 'Asr', time: prayerTimings.Asr },
+                { name: 'Maghrib', time: prayerTimings.Maghrib },
+                { name: 'Isha', time: prayerTimings.Isha }
+            ];
+
+            for (let p of prayers) {
+                const [h, m] = p.time.split(':').map(Number);
+                const prayerMinutes = h * 60 + m;
+                if (prayerMinutes > currentMinutes) {
+                    return { name: p.name, time: p.time, minutes: prayerMinutes };
+                }
+            }
+            const [fh, fm] = prayerTimings.Fajr.split(':').map(Number);
+            return { name: 'Fajr', time: prayerTimings.Fajr, minutes: (fh + 24) * 60 + fm };
+        }
+
+        function startNextPrayerCountdown() {
+            if (countdownInterval) clearInterval(countdownInterval);
+
+            countdownInterval = setInterval(() => {
+                const next = getNextPrayer();
+                if (!next) return;
+
+                document.getElementById('next-prayer-name').innerText = next.name.toUpperCase();
+
+                const now = new Date();
+                let target = new Date();
+                const [h, m] = next.time.split(':').map(Number);
+                target.setHours(h, m, 0, 0);
+
+                if (next.name === 'Fajr' && now.getHours() > 12) {
+                    target.setDate(target.getDate() + 1);
+                }
+
+                const diff = target - now;
+                if (diff <= 0) {
+                    renderPrayerCards();
+                    renderDailyPrayers();
+                    return;
+                }
+
+                const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const minutes = Math.floor((diff / (1000 * 60)) % 60);
+                const seconds = Math.floor((diff / 1000) % 60);
+
+                const hh = hours < 10 ? '0' + hours : hours;
+                const mm = minutes < 10 ? '0' + minutes : minutes;
+                const ss = seconds < 10 ? '0' + seconds : seconds;
+
+                document.getElementById('countdown-timer').innerText = `${hh}:${mm}:${ss}`;
+            }, 1000);
+        }
+
+        function calibrateQibla() {
+            const needle = document.getElementById('compass-needle');
+            needle.style.transform = `rotate(${qiblaDeg + 360}deg)`;
+            const lang = localStorage.getItem('userLang') || 'id.indonesian';
+            showToast(lang === 'en.asad' ? 'Calibrating compass sensor...' : 'Mengkalibrasi sensor kompas...', 'info');
+            setTimeout(() => {
+                needle.style.transform = `rotate(${qiblaDeg}deg)`;
+                showToast(lang === 'en.asad' ? 'Qibla direction calibrated' : 'Arah kiblat berhasil dikalibrasi', 'success');
+            }, 1500);
+        }
+
+
+        async function loadSurahList() {
+            try {
+                const res = await fetch('https://api.alquran.cloud/v1/surah');
+                const data = await res.json();
+                surahList = data.data;
+
+                document.getElementById('surah-loading').classList.add('hidden');
+                const container = document.getElementById('surah-list-container');
+                container.classList.remove('hidden');
+
+                renderSurahList(surahList);
+            } catch(e){
+                const lang = localStorage.getItem('userLang') || 'id.indonesian';
+                document.getElementById('surah-loading').innerHTML = `<p class="text-red-500 text-xs">${lang === 'en.asad' ? 'Failed to load Surah list.' : 'Gagal memuat daftar Surah.'}</p>`;
+            }
+        }
+
+        function renderSurahList(list) {
+            const container = document.getElementById('surah-list-container');
+            const lang = localStorage.getItem('userLang') || 'id.indonesian';
+
+            if (list.length === 0) {
+                container.innerHTML = `<p class="text-center py-8 text-gray-500 text-sm">${lang === 'en.asad' ? 'No Surah found.' : 'Surah tidak ditemukan.'}</p>`;
+                return;
+            }
+
+            container.innerHTML = list.map(s => `
+                <a href="baca.html?surah=${s.number}" class="bg-white dark:bg-darkcard p-4 rounded-lg border border-gray-200 dark:border-gray-800 flex items-center justify-between hover:border-primary dark:hover:border-emerald-500 transition group">
+                    <div class="flex items-center gap-3.5 overflow-hidden">
+                        <div class="w-11 h-11 rounded-lg bg-orange-50 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-900 text-secondary flex items-center justify-center font-bold text-sm group-hover:scale-110 transition duration-200 flex-shrink-0">
+                            ${s.number}
+                        </div>
+                        <div class="overflow-hidden">
+                            <h4 class="font-bold text-gray-900 dark:text-white text-sm mb-0.5 group-hover:text-primary dark:group-hover:text-emerald-400 transition truncate">${s.englishName}</h4>
+                            <p class="text-[11px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold truncate">${s.englishNameTranslation} • ${s.numberOfAyahs} AYAHS</p>
+                        </div>
+                    </div>
+                    <div class="text-right font-arabic text-xl font-bold text-primary dark:text-emerald-400 pr-1 flex-shrink-0">
+                        ${s.name.replace('سُورَةُ ', '')}
+                    </div>
+                </a>
+            `).join('');
+        }
+
+        function initSearch() {
+            const input = document.getElementById('search-surah-input');
+            input.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                const filtered = surahList.filter(s => 
+                    s.englishName.toLowerCase().includes(query) || 
+                    s.englishNameTranslation.toLowerCase().includes(query) ||
+                    s.number.toString() === query
+                );
+                renderSurahList(filtered);
             });
-        };
+        }
 
-        modeEl.onchange = async () => {
-            await populateSelector();
-            loadContent();
-        };
-
-        selector.onchange = () => {
-            loadContent();
-            window.scrollTo(0, 0);
-        };
-
-        // INIT
-        (async () => {
-            await populateSelector();
-            loadContent();
-        })();
+        function resetSearch() {
+            const input = document.getElementById('search-surah-input');
+            input.value = '';
+            renderSurahList(surahList);
+        }
     </script>
-
-    </script>
-
 </body>
 
 </html>
